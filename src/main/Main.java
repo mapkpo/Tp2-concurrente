@@ -11,6 +11,8 @@ public class Main {
     System.out.println(red.cualessensibilizadas());
     red.disparar(0);
     System.out.println(red.cualessensibilizadas());
+    red.disparar(1);
+    System.out.println(red.cualessensibilizadas());
 
 
 
