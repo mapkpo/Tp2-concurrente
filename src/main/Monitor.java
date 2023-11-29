@@ -25,6 +25,7 @@ public class Monitor {
         //s_create = new Semaphore(1);
     }
 
+    /* Trys to acquire the mutex. */
     private void GetMutex()
     {
         try{
@@ -34,7 +35,7 @@ public class Monitor {
         }
     }
 
-    //T0
+    /* T0: Agrega una imagen al buffer de entrada. */
     public void AddImagen(Imagen img) {
         //Todo: usar un semaforo para bloquear la adicion de mas imagenes
         //  cuando se puedan hacer otras cosas (s_create).
@@ -47,7 +48,7 @@ public class Monitor {
         mutex.release();
     }
 
-    //T1 y T2
+    /* T1|T2: Toma una imagen del buffer de entrada. */
     public Imagen StartPocessing() {
         int T = 1;
         while(true){
@@ -78,7 +79,7 @@ public class Monitor {
         return to_process;
     }
 
-    //T3 y T4
+    /* T3|T4: Agrega una imagen ya procesada al buffer de procesadas. */
     public void FinishProcessing(Imagen img){
         int T = 3;
         while (true){
@@ -100,7 +101,7 @@ public class Monitor {
         s_proc.release();
     }
 
-    //T5 y T6
+    /* T5|T6: Toma una imagen del buffer de procesadas. */
     public Imagen StartAjuste(){
         int T = 5;
         while (true){
@@ -127,6 +128,7 @@ public class Monitor {
         return to_adjust;
     }
 
+    /* T7|T8: Dispara la transicion correspondiente en la RDP. */
     public void MidAjuste(){
         int T = 7;
         while (true){
@@ -143,6 +145,7 @@ public class Monitor {
         mutex.release();
     }
 
+    /* T9|T10: Agrega una imagen ya ajustada al bufffer de ajustadas. */
     public void FinishAjuste(Imagen img){
         int T = 9;
         while (true){
