@@ -10,15 +10,18 @@ public class Monitor {
     //El mutex ya da toda la proteccion necesaria, los demas semaforos estan para coordinacion unicamente.
     //final private Semaphore s_create;
     final private Semaphore s_proc;
+    final private Semaphore s_ajuste;
 
     //Todo: Usar una clase contenedor en lugar de listas?
-    List<Imagen> BufferEntrada = new ArrayList<>();         //P0
-    List<Imagen> BufferProcesamiento = new ArrayList<>();   //P6
+    List<Imagen> BufferEntrada = new ArrayList<>();     //P0
+    List<Imagen> BufferProcesadas = new ArrayList<>();  //P6
+    List<Imagen> BufferAjustadas = new ArrayList<>();   //P14
 
     public Monitor(){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
         s_proc = new Semaphore(3);
+        s_ajuste = new Semaphore(2);
         //s_create = new Semaphore(1);
     }
 
@@ -32,8 +35,7 @@ public class Monitor {
     }
 
     //T0
-    public void AddImagen(Imagen img)
-    {
+    public void AddImagen(Imagen img) {
         //Todo: usar un semaforo para bloquear la adicion de mas imagenes
         //  cuando se puedan hacer otras cosas (s_create).
         GetMutex();
@@ -70,7 +72,7 @@ public class Monitor {
         petri.disparar(T);
 
         Imagen to_process = BufferEntrada.get(0);
-        BufferEntrada.remove(0);
+        BufferEntrada.remove(to_process);
 
         mutex.release();
         return to_process;
@@ -92,11 +94,72 @@ public class Monitor {
         }
 
         petri.disparar(T);
-        BufferProcesamiento.add(img);
+        BufferProcesadas.add(img);
 
         mutex.release();
         s_proc.release();
     }
-    
 
+    //T5 y T6
+    public Imagen StartAjuste(){
+        int T = 5;
+        while (true){
+            try{
+                s_ajuste.acquire();
+            } catch (InterruptedException e){
+                System.out.println("Monitor: interrupted while trying to acquire s_ajuste: " + e);
+            }
+            GetMutex();
+            if(petri.issensibilizada(5))
+                break;
+            if(petri.issensibilizada(6)){
+                T = 6;
+                break;
+            }
+            s_ajuste.release();
+            mutex.release();
+        }
+
+        Imagen to_adjust = BufferProcesadas.get(0);
+        BufferProcesadas.remove(to_adjust);
+
+        mutex.release();
+        return to_adjust;
+    }
+
+    public void MidAjuste(){
+        int T = 7;
+        while (true){
+            GetMutex();
+            if(petri.issensibilizada(7))
+                break;
+            if(petri.issensibilizada(8)){
+                T = 8;
+                break;
+            }
+            mutex.release();
+        }
+        petri.disparar(T);
+        mutex.release();
+    }
+
+    public void FinishAjuste(Imagen img){
+        int T = 9;
+        while (true){
+            GetMutex();
+            if(petri.issensibilizada(9))
+                break;
+            if(petri.issensibilizada(10)){
+                T = 10;
+                break;
+            }
+            mutex.release();
+        }
+
+        petri.disparar(T);
+        BufferAjustadas.add(img);
+
+        s_ajuste.release();
+        mutex.release();
+    }
 }
