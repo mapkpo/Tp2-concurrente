@@ -2,7 +2,10 @@
 
 #cosas a hacer
 
-clase cargador
+clase cargador  
+
 clase ajustador
+
 clase recortador
+
 clase exportador
