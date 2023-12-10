@@ -11,23 +11,29 @@ public class Monitor {
     //final private Semaphore s_create;
     final private Semaphore s_proc;
     final private Semaphore s_ajuste;
+    final private Semaphore s_recorte;
+    final private Semaphore s_exporta;
 
     //Todo: Usar una clase contenedor en lugar de listas?
     List<Imagen> BufferEntrada = new ArrayList<>();     //P0
     List<Imagen> BufferProcesadas = new ArrayList<>();  //P6
     List<Imagen> BufferAjustadas = new ArrayList<>();   //P14
+    List<Imagen> BufferListas = new ArrayList<>();   //P18
+    List<Imagen> BufferExportadas = new ArrayList<>();   //OUTPUT
+
 
     public Monitor(){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
         s_proc = new Semaphore(3);
         s_ajuste = new Semaphore(2);
+        s_recorte = new Semaphore(1);
+        s_exporta = new Semaphore(1);
         //s_create = new Semaphore(1);
     }
 
     /* Trys to acquire the mutex. */
-    private void GetMutex()
-    {
+    private void GetMutex() {
         try{
             mutex.acquire();
         } catch (InterruptedException e){
@@ -121,6 +127,7 @@ public class Monitor {
             mutex.release();
         }
 
+        petri.disparar(T);
         Imagen to_adjust = BufferProcesadas.get(0);
         BufferProcesadas.remove(to_adjust);
 
@@ -163,6 +170,92 @@ public class Monitor {
         BufferAjustadas.add(img);
 
         s_ajuste.release();
+        mutex.release();
+    }
+
+    /* T11|T122: Toma una imagen para ser recortada. */
+    public Imagen StartRecorte(){
+        int T = 11;
+        while (true){
+            try{
+                s_recorte.acquire();
+            } catch (InterruptedException e){
+                System.out.println("Monitor: interrupted while trying to acquire s_recorte: " + e);
+            }
+            GetMutex();
+            if(petri.issensibilizada(11))
+                break;
+            if(petri.issensibilizada(12)){
+                T = 12;
+                break;
+            }
+            s_recorte.release();
+            mutex.release();
+        }
+        petri.disparar(T);
+        Imagen to_cut = BufferAjustadas.get(0);
+        BufferAjustadas.remove(to_cut);
+
+        mutex.release();
+        return to_cut;
+    }
+
+    /* T13|T14: Carga las imagenes ya recortadas al buffer final. */
+    public void FinishRecorte(Imagen img){
+        int T = 13;
+        while (true){
+            GetMutex();
+            if(petri.issensibilizada(13))
+                break;
+            if(petri.issensibilizada(14)){
+                T = 14;
+                break;
+            }
+            mutex.release();
+        }
+
+        petri.disparar(T);
+        BufferListas.add(img);
+
+        s_recorte.release();
+        mutex.release();
+    }
+
+    /* T15: Toma una imagen para exportarla. */
+    public Imagen StartExportacion(){
+        while (true){
+            try{
+                s_exporta.acquire();
+            } catch (InterruptedException e){
+                System.out.println("Monitor: interrupted while trying to acquire s_exporta: " + e);
+            }
+            GetMutex();
+            if(petri.issensibilizada(15))
+                break;
+            s_exporta.release();
+            mutex.release();
+        }
+
+        petri.disparar(15);
+        Imagen to_export = BufferListas.get(0);
+        BufferListas.remove(to_export);
+
+        mutex.release();
+        return to_export;
+    }
+
+    /* T16: Carga la imagen en el buffer de exportadas. */
+    public void FinishExportacion(Imagen img){
+        while (true){
+            GetMutex();
+            if(petri.issensibilizada(16))
+                break;
+            mutex.release();
+        }
+
+        petri.disparar(16);
+        BufferExportadas.add(img);
+        s_exporta.release();
         mutex.release();
     }
 }
