@@ -1,7 +1,5 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Semaphore;
 
 public class Monitor {
@@ -15,11 +13,11 @@ public class Monitor {
     final private Semaphore s_exporta;
 
     //Todo: Usar una clase contenedor en lugar de listas?
-    List<Imagen> bufferentrada = new ArrayList<>();     //P0
-    List<Imagen> bufferprocesadas = new ArrayList<>();  //P6
-    List<Imagen> bufferajustadas = new ArrayList<>();   //P14
-    List<Imagen> bufferlistas = new ArrayList<>();   //P18
-    List<Imagen> bufferexportadas = new ArrayList<>();   //OUTPUT
+    Contenedor bufferentrada = new Contenedor(20);     //P0
+    Contenedor bufferaprocesar = new Contenedor(20);  //P6
+    Contenedor bufferajustadas = new Contenedor(20);   //P14
+    Contenedor bufferlistas = new Contenedor(20);   //P18
+    Contenedor bufferexportadas = new Contenedor(200);   //OUTPUT
 
 
     public Monitor(){
@@ -48,14 +46,14 @@ public class Monitor {
         getmutex();
 
         //No reviso si T0 esta sensibilizada porque ya sabemos que siempre esta sensibilizada
-        bufferentrada.add(img);
+        bufferentrada.agregar(img);
         petri.disparar(0);
 
         mutex.release();
     }
 
     /* T1|T2: Toma una imagen del buffer de entrada. */
-    public Imagen startprocessing() {
+    public Imagen startcarga() {
         int T = 1;
         while(true){
             //Todo: Quizas agregar otro semaforo que simule P3 para evitar que bloquee los
@@ -78,15 +76,14 @@ public class Monitor {
 
         petri.disparar(T);
 
-        Imagen to_process = bufferentrada.get(0);
-        bufferentrada.remove(to_process);
+        Imagen to_process = bufferentrada.getImagen();
 
         mutex.release();
         return to_process;
     }
 
-    /* T3|T4: Agrega una imagen ya procesada al buffer de procesadas. */
-    public void finishprocessing(Imagen img){
+    /* T3|T4: Carga la imagen al buffer de imagenes a procesar. */
+    public void finishcarga(Imagen img){
         int T = 3;
         while (true){
             getmutex();
@@ -101,13 +98,13 @@ public class Monitor {
         }
 
         petri.disparar(T);
-        bufferprocesadas.add(img);
+        bufferaprocesar.agregar(img);
 
         mutex.release();
         s_proc.release();
     }
 
-    /* T5|T6: Toma una imagen del buffer de procesadas. */
+    /* T5|T6: Toma una imagen del buffer a procesar. */
     public Imagen startajuste(){
         int T = 5;
         while (true){
@@ -128,8 +125,7 @@ public class Monitor {
         }
 
         petri.disparar(T);
-        Imagen to_adjust = bufferprocesadas.get(0);
-        bufferprocesadas.remove(to_adjust);
+        Imagen to_adjust = bufferaprocesar.getImagen();
 
         mutex.release();
         return to_adjust;
@@ -167,7 +163,7 @@ public class Monitor {
         }
 
         petri.disparar(T);
-        bufferajustadas.add(img);
+        bufferajustadas.agregar(img);
 
         s_ajuste.release();
         mutex.release();
@@ -193,8 +189,7 @@ public class Monitor {
             mutex.release();
         }
         petri.disparar(T);
-        Imagen to_cut = bufferajustadas.get(0);
-        bufferajustadas.remove(to_cut);
+        Imagen to_cut = bufferajustadas.getImagen();
 
         mutex.release();
         return to_cut;
@@ -215,7 +210,7 @@ public class Monitor {
         }
 
         petri.disparar(T);
-        bufferlistas.add(img);
+        bufferlistas.agregar(img);
 
         s_recorte.release();
         mutex.release();
@@ -237,8 +232,7 @@ public class Monitor {
         }
 
         petri.disparar(15);
-        Imagen to_export = bufferlistas.get(0);
-        bufferlistas.remove(to_export);
+        Imagen to_export = bufferlistas.getImagen();
 
         mutex.release();
         return to_export;
@@ -254,7 +248,7 @@ public class Monitor {
         }
 
         petri.disparar(16);
-        bufferexportadas.add(img);
+        bufferexportadas.agregar(img);
         s_exporta.release();
         mutex.release();
     }

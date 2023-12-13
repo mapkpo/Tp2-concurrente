@@ -1,12 +1,10 @@
 # Tp2-concurrente
-#https://drive.google.com/drive/u/1/folders/1EaoqU-XaBNIYEEj9CE8ggGr51XNpFXsZ
 
-#cosas a hacer
+- https://drive.google.com/drive/u/1/folders/1EaoqU-XaBNIYEEj9CE8ggGr51XNpFXsZ
 
-clase cargador  
+## cosas a hacer
 
-clase ajustador
-
-clase recortador
-
-clase exportador
+- clase cargador
+- clase ajustador
+- clase recortador
+- clase exportador
