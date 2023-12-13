@@ -33,6 +33,7 @@ public class Contenedor {
     public Imagen getImagen() {
         if (!imagenes.isEmpty()) {
             Imagen img = imagenes.get(imagenes.size() - 1);
+            imagenes.remove(img);
             return img;
         }
         return null;
