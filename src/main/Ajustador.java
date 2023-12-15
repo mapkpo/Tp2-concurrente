@@ -23,9 +23,9 @@ public class Ajustador implements Runnable{
                 System.out.println(ex.getMessage());
             }
             img.recortarinicio();
-            System.out.println(threadName + ": Ajuste inicial finalizado exitosamente.");
 
             monitor.midajuste();
+            System.out.println(threadName + ": Ajuste inicial finalizado exitosamente.");
             System.out.println(threadName + ": Iniciando ajuste final.");
             try{
                 Thread.sleep(1000);
@@ -33,9 +33,9 @@ public class Ajustador implements Runnable{
                 System.out.println(ex.getMessage());
             }
             img.recortarfinal();
-            System.out.println(threadName + ": Ajuste final finalizado exitosamente.");
 
             monitor.finishajuste(img);
+            System.out.println(threadName + ": Ajuste final finalizado exitosamente.");
         }
     }
 }
