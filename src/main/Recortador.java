@@ -24,7 +24,7 @@ public class Recortador implements Runnable{
                 System.out.println(ex.getMessage());
             }
 
-            img.ajustar();
+            img.recortar();
             monitor.finishrecorte(img);
             System.out.println(threadName + ": Imagen recortada exitosamente.");
         }

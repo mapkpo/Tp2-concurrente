@@ -2,33 +2,33 @@ package main;
 
 public class Imagen {
 
-    private boolean ajustada;
-    private boolean[] recortada;
+    private boolean recortada;
+    private boolean[] ajustada;
 
     public Imagen(){
-        ajustada = false;
-        recortada = new boolean[]{false, false};
+        recortada = false;
+        ajustada = new boolean[]{false, false};
 
     }
 
-    public void ajustar(){
-        ajustada = true;
+    public void recortar(){
+        recortada = true;
     }
 
-    public void recortarinicio(){
-        recortada[0] = true;
+    public void ajustarinicio(){
+        ajustada[0] = true;
     }
 
-    public void recortarfinal(){
-        recortada[1] = true;
+    public void ajustarfinal(){
+        ajustada[1] = true;
     }
 
-    public boolean isajustada(){
-        return ajustada;
+    public boolean isrecortada(){
+        return recortada;
     }
 
-    public boolean isrecortada() {
-        for (boolean b : recortada) {
+    public boolean isajustada() {
+        for (boolean b : ajustada) {
             if (!b) {
                 return false;
             }
