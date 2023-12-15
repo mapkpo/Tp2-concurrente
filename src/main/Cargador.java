@@ -13,9 +13,10 @@ public class Cargador implements Runnable{
         threadName = Thread.currentThread().getName();
 
         while (true){
-            System.out.println(threadName + ": Intentando cargar una imagen.");
+            System.out.println(threadName + ": Buscando imagen para cargar.");
             Imagen img = monitor.startcarga();
 
+            System.out.println(threadName + ": Iniciando carga.");
             //Simula tiempo de carga.
             try{
                 Thread.sleep(1000);
@@ -24,7 +25,7 @@ public class Cargador implements Runnable{
             }
 
             monitor.finishcarga(img);
-            System.out.println(threadName + "Imagen cargada exitósamente.");
+            System.out.println(threadName + ": Imagen cargada exitósamente.");
         }
     }
 }
