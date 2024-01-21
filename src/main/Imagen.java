@@ -8,26 +8,25 @@ public class Imagen {
     public Imagen(){
         recortada = false;
         ajustada = new boolean[]{false, false};
-
     }
 
     public void recortar(){
         recortada = true;
     }
 
-    public void ajustarinicio(){
+    public void ajustarInicio(){
         ajustada[0] = true;
     }
 
-    public void ajustarfinal(){
+    public void ajustarFinal(){
         ajustada[1] = true;
     }
 
-    public boolean isrecortada(){
+    public boolean isRecortada(){
         return recortada;
     }
 
-    public boolean isajustada() {
+    public boolean isAjustada() {
         for (boolean b : ajustada) {
             if (!b) {
                 return false;
