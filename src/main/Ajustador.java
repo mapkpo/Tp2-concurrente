@@ -22,7 +22,7 @@ public class Ajustador implements Runnable{
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }
-            img.ajustarinicio();
+            img.ajustarInicio();
 
             monitor.midajuste();
             System.out.println(threadName + ": Ajuste inicial finalizado exitosamente.");
@@ -32,7 +32,7 @@ public class Ajustador implements Runnable{
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }
-            img.ajustarfinal();
+            img.ajustarFinal();
 
             monitor.finishajuste(img);
             System.out.println(threadName + ": Ajuste final finalizado exitosamente.");
