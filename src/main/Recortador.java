@@ -14,19 +14,19 @@ public class Recortador implements Runnable{
         threadName = Thread.currentThread().getName();
 
         while (true){
-            System.out.println(threadName + ": Buscando imagen para recortar.");
+            //System.out.println(threadName + ": Buscando imagen para recortar.");
             Imagen img = monitor.startrecorte();
 
-            System.out.println(threadName + ": Inciando recorte.");
+            //System.out.println(threadName + ": Inciando recorte.");
             try{
-                Thread.sleep(1000);
+                Thread.sleep(10);
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }
 
             img.recortar();
             monitor.finishrecorte(img);
-            System.out.println(threadName + ": Imagen recortada exitosamente.");
+           // System.out.println(threadName + ": Imagen recortada exitosamente.");
         }
     }
 }

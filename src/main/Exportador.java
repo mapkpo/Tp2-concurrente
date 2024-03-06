@@ -13,13 +13,13 @@ public class Exportador implements Runnable{
         threadName = Thread.currentThread().getName();
 
         while (true){
-            System.out.println(threadName + ": Buscando imagen para exportar.");
+            //System.out.println(threadName + ": Buscando imagen para exportar.");
             Imagen img = monitor.startexporte();
 
-            System.out.println(threadName + ": Iniciando exporte.");
+            //System.out.println(threadName + ": Iniciando exporte.");
             //Simula tiempo de carga.
             try{
-                Thread.sleep(1000);
+                Thread.sleep(10);
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }

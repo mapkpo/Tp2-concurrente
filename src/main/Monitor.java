@@ -12,22 +12,28 @@ public class Monitor {
     final private Semaphore s_recorte;
     final private Semaphore s_exporta;
 
+    private int exportadas;
+
+
+
     //Todo: Usar una clase contenedor en lugar de listas?
-    Contenedor bufferentrada = new Contenedor(20);     //P0
-    Contenedor bufferaprocesar = new Contenedor(20);  //P6
-    Contenedor bufferajustadas = new Contenedor(20);   //P14
-    Contenedor bufferlistas = new Contenedor(20);   //P18
-    Contenedor bufferexportadas = new Contenedor(200);   //OUTPUT
+    Contenedor bufferentrada = new Contenedor();     //P0
+    Contenedor bufferaprocesar = new Contenedor();  //P6
+    Contenedor bufferajustadas = new Contenedor();   //P14
+    Contenedor bufferlistas = new Contenedor();   //P18
+    Contenedor bufferexportadas = new Contenedor();   //OUTPUT
 
 
     public Monitor(){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
-        s_proc = new Semaphore(3);
-        s_ajuste = new Semaphore(2);
-        s_recorte = new Semaphore(1);
-        s_exporta = new Semaphore(1);
+        s_proc = new Semaphore(3);          //P3
+        s_ajuste = new Semaphore(2);        //P9
+        s_recorte = new Semaphore(1);       //P15
+        s_exporta = new Semaphore(1);       //P20
         //s_create = new Semaphore(1);
+
+        exportadas = 0;
     }
 
     /* Trys to acquire the mutex. */
@@ -47,8 +53,11 @@ public class Monitor {
 
         //No reviso si T0 esta sensibilizada porque ya sabemos que siempre esta sensibilizada
         bufferentrada.agregar(img);
+
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(0);
 
+        //System.out.println(petri.cualessensibilizadas());
         mutex.release();
     }
 
@@ -73,9 +82,10 @@ public class Monitor {
             mutex.release();
             s_proc.release();
         }
-
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
 
+        //System.out.println(petri.cualessensibilizadas());
         Imagen to_process = bufferentrada.getImagen();
 
         mutex.release();
@@ -96,8 +106,10 @@ public class Monitor {
 
             mutex.release();
         }
-
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
+
+        //System.out.println(petri.cualessensibilizadas());
         bufferaprocesar.agregar(img);
 
         mutex.release();
@@ -123,8 +135,11 @@ public class Monitor {
             s_ajuste.release();
             mutex.release();
         }
+        //System.out.println(petri.cualessensibilizadas());
 
         petri.disparar(T);
+
+        //System.out.println(petri.cualessensibilizadas());
         Imagen to_adjust = bufferaprocesar.getImagen();
 
         mutex.release();
@@ -144,7 +159,11 @@ public class Monitor {
             }
             mutex.release();
         }
+
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
+
+        //System.out.println(petri.cualessensibilizadas());
         mutex.release();
     }
 
@@ -162,7 +181,10 @@ public class Monitor {
             mutex.release();
         }
 
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
+
+       //System.out.println(petri.cualessensibilizadas());
         bufferajustadas.agregar(img);
 
         s_ajuste.release();
@@ -188,7 +210,11 @@ public class Monitor {
             s_recorte.release();
             mutex.release();
         }
+
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
+
+        //.out.println(petri.cualessensibilizadas());
         Imagen to_cut = bufferajustadas.getImagen();
 
         mutex.release();
@@ -209,7 +235,10 @@ public class Monitor {
             mutex.release();
         }
 
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
+
+        //System.out.println(petri.cualessensibilizadas());
         bufferlistas.agregar(img);
 
         s_recorte.release();
@@ -230,8 +259,10 @@ public class Monitor {
             s_exporta.release();
             mutex.release();
         }
-
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(15);
+
+        //System.out.println(petri.cualessensibilizadas());
         Imagen to_export = bufferlistas.getImagen();
 
         mutex.release();
@@ -247,9 +278,15 @@ public class Monitor {
             mutex.release();
         }
 
+        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(16);
+
+        //System.out.println(petri.cualessensibilizadas());
         bufferexportadas.agregar(img);
         s_exporta.release();
         mutex.release();
+
+        exportadas++;
+        //System.out.println("se exportaron " + exportadas);
     }
 }

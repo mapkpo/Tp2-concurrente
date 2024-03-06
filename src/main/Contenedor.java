@@ -4,15 +4,16 @@ import java.util.ArrayList;
 public class Contenedor {
     private final ArrayList<Imagen> imagenes;
     private int agregadas;
-    private final int totales;
+    //private final int totales;
 
-    public Contenedor(int cantidad) {
+    //public Contenedor(int cantidad) {
+    public Contenedor() {
         this.imagenes =  new ArrayList<>();
         this.agregadas = 0;
-        this.totales = cantidad;
+        //this.totales = cantidad;
     }
 
-    void agregar(Imagen imagen){
+    /*void agregar(Imagen imagen){
         if(agregadas < totales){
             this.imagenes.add(imagen);
             agregarContador();
@@ -20,6 +21,10 @@ public class Contenedor {
         else {
             System.out.println("Ya se ha alcanzado el límite");
         }
+    }*/
+    void agregar(Imagen imagen){
+        this.imagenes.add(imagen);
+        agregarContador();
     }
 
     private void agregarContador(){
@@ -34,6 +39,7 @@ public class Contenedor {
         if (!imagenes.isEmpty()) {
             Imagen img = imagenes.get(imagenes.size() - 1);
             imagenes.remove(img);
+
             return img;
         }
         return null;

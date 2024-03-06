@@ -14,19 +14,19 @@ public class Creador implements Runnable{
         while (true){
             //Duerme para representar el tiempo que le tomaría crear una nueva imagen.
             try{
-                System.out.println(threadName + ": Intentando crear una nueva imagen.");
-                Thread.sleep(1000);
+                //System.out.println(threadName + ": Intentando crear una nueva imagen.");
+                Thread.sleep(10);
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }
 
-            System.out.println(threadName + ": Nueva imagen creada con éxito.");
-            System.out.println(threadName + ": Intentando pasar nueva imagen al sistema.");
+            //System.out.println(threadName + ": Nueva imagen creada con éxito.");
+            //System.out.println(threadName + ": Intentando pasar nueva imagen al sistema.");
 
             //Espera a poder tomar control del mutex del monitor para agregar la imagen al contenedor P0.
             monitor.addimagen(new Imagen());
 
-            System.out.println(threadName + ": Nueva imagen agregada con éxito.");
+            //System.out.println(threadName + ": Nueva imagen agregada con éxito.");
         }
     }
 }
