@@ -3,7 +3,7 @@ package main;
 public class Main {
     public static void main(String[] args) {
 
-    Monitor monitor = new Monitor();
+    Monitor monitor = new Monitor("5050");
 
     Creador creador = new Creador(monitor);
 

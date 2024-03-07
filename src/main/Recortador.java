@@ -19,7 +19,7 @@ public class Recortador implements Runnable{
 
             //System.out.println(threadName + ": Inciando recorte.");
             try{
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }

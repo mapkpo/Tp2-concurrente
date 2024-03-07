@@ -19,7 +19,7 @@ public class Cargador implements Runnable{
             //System.out.println(threadName + ": Iniciando carga.");
             //Simula tiempo de carga.
             try{
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }

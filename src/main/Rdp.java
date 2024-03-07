@@ -33,6 +33,8 @@ public class Rdp {
     private final double[] marcadoinicial = {0, 1, 0, 3, 0, 1, 0, 1, 0, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1};
     private final double[] transicionm = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+    private final int[] contadordedisparos = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
     public Rdp() {
     }
 
@@ -82,12 +84,26 @@ public class Rdp {
     }
 
     public void disparar(int a){
-        if(issensibilizada(a)){
-            RealVector adisparar1 = transicion.copy();
-            adisparar1.setEntry(a, 1);
+        if (a < transicionm.length){
+            if(issensibilizada(a)){
+                RealVector adisparar1 = transicion.copy();
 
-            RealVector nuevomarcado = incidencia.operate(adisparar1).add(marcado);
-            actualizarmarcado(nuevomarcado);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                adisparar1.setEntry(a, 1);
+
+                RealVector nuevomarcado = incidencia.operate(adisparar1).add(marcado);
+                actualizarmarcado(nuevomarcado);
+
+                contadordedisparos[a]++;
+            }
+        }
+        else {
+            System.out.println("Fuera de rango");
         }
     }
 
@@ -99,6 +115,15 @@ public class Rdp {
         for(int i=0; i<marcado.getDimension(); i++){
             System.out.println(marcado.getEntry(i));
         }
+    }
+
+    public void imprimircontador(){
+        //for(int i=0; i<17; i++){
+            System.out.print(contadordedisparos[13]);
+            System.out.print(",");
+            System.out.print(contadordedisparos[14]);
+        //}
+        System.out.println("");
     }
 
 }

@@ -1,6 +1,7 @@
 package main;
-
 import java.util.concurrent.Semaphore;
+
+import java.util.Random;
 
 public class Monitor {
     final private Rdp petri;
@@ -12,11 +13,16 @@ public class Monitor {
     final private Semaphore s_recorte;
     final private Semaphore s_exporta;
 
+    private String politica;
+
+
+    //final private Semaphore s_create; //redundante
+
+
     private int exportadas;
 
 
 
-    //Todo: Usar una clase contenedor en lugar de listas?
     Contenedor bufferentrada = new Contenedor();     //P0
     Contenedor bufferaprocesar = new Contenedor();  //P6
     Contenedor bufferajustadas = new Contenedor();   //P14
@@ -24,14 +30,16 @@ public class Monitor {
     Contenedor bufferexportadas = new Contenedor();   //OUTPUT
 
 
-    public Monitor(){
+    public Monitor(String a){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
         s_proc = new Semaphore(3);          //P3
         s_ajuste = new Semaphore(2);        //P9
         s_recorte = new Semaphore(1);       //P15
         s_exporta = new Semaphore(1);       //P20
-        //s_create = new Semaphore(1);
+        politica = a;
+
+        //s_create = new Semaphore(1); //creo que es redundante 
 
         exportadas = 0;
     }
@@ -50,16 +58,35 @@ public class Monitor {
         //Todo: usar un semaforo para bloquear la adicion de mas imagenes
         //  cuando se puedan hacer otras cosas (s_create).
         getmutex();
-
         //No reviso si T0 esta sensibilizada porque ya sabemos que siempre esta sensibilizada
         bufferentrada.agregar(img);
-
-        //System.out.println(petri.cualessensibilizadas());
+        //System.out.println("imagen agregada");
         petri.disparar(0);
-
-        //System.out.println(petri.cualessensibilizadas());
         mutex.release();
     }
+
+    /**
+     * prueba con el semaforo para s_create
+    
+    public void addimagen(Imagen imagen){
+        while(true){
+
+            try{
+                s_create.acquire();
+            } catch (InterruptedException e){
+                System.out.println("Monitor: interrupted while trying to acquire s_create: " + e);
+            }
+            getmutex();
+            break;
+        }
+
+        bufferentrada.agregar(imagen);
+        petri.disparar(0);
+        System.out.println("imagen agregada");
+
+        mutex.release();
+        s_create.release();
+    }*/
 
     /* T1|T2: Toma una imagen del buffer de entrada. */
     public Imagen startcarga() {
@@ -82,12 +109,8 @@ public class Monitor {
             mutex.release();
             s_proc.release();
         }
-        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
-
-        //System.out.println(petri.cualessensibilizadas());
         Imagen to_process = bufferentrada.getImagen();
-
         mutex.release();
         return to_process;
     }
@@ -103,15 +126,10 @@ public class Monitor {
                 T = 4;
                 break;
             }
-
             mutex.release();
         }
-        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
-
-        //System.out.println(petri.cualessensibilizadas());
         bufferaprocesar.agregar(img);
-
         mutex.release();
         s_proc.release();
     }
@@ -135,13 +153,8 @@ public class Monitor {
             s_ajuste.release();
             mutex.release();
         }
-        //System.out.println(petri.cualessensibilizadas());
-
         petri.disparar(T);
-
-        //System.out.println(petri.cualessensibilizadas());
         Imagen to_adjust = bufferaprocesar.getImagen();
-
         mutex.release();
         return to_adjust;
     }
@@ -159,11 +172,7 @@ public class Monitor {
             }
             mutex.release();
         }
-
-        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
-
-        //System.out.println(petri.cualessensibilizadas());
         mutex.release();
     }
 
@@ -180,20 +189,15 @@ public class Monitor {
             }
             mutex.release();
         }
-
-        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
-
-       //System.out.println(petri.cualessensibilizadas());
         bufferajustadas.agregar(img);
-
         s_ajuste.release();
         mutex.release();
     }
 
     /* T11|T122: Toma una imagen para ser recortada. */
     public Imagen startrecorte(){
-        int T = 11;
+        int T;
         while (true){
             try{
                 s_recorte.acquire();
@@ -201,22 +205,34 @@ public class Monitor {
                 System.out.println("Monitor: interrupted while trying to acquire s_recorte: " + e);
             }
             getmutex();
-            if(petri.issensibilizada(11))
-                break;
-            if(petri.issensibilizada(12)){
-                T = 12;
-                break;
+
+            Random rand = new Random();
+            double probabilidad = rand.nextDouble();
+            
+            if(petri.issensibilizada(11) && petri.issensibilizada(12)){
+                if(politica.equals("8020")){
+                    if (probabilidad < 0.8){
+                        T = 11;
+                        break;
+                    } else {
+                        T = 12;
+                        break;
+                    }
+                }
+                if(probabilidad < 0.5){
+                    T = 11;
+                    break;
+                } else {
+                    T = 12;
+                    break;
+                }
             }
+
             s_recorte.release();
             mutex.release();
         }
-
-        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
-
-        //.out.println(petri.cualessensibilizadas());
         Imagen to_cut = bufferajustadas.getImagen();
-
         mutex.release();
         return to_cut;
     }
@@ -234,13 +250,8 @@ public class Monitor {
             }
             mutex.release();
         }
-
-        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(T);
-
-        //System.out.println(petri.cualessensibilizadas());
         bufferlistas.agregar(img);
-
         s_recorte.release();
         mutex.release();
     }
@@ -259,12 +270,8 @@ public class Monitor {
             s_exporta.release();
             mutex.release();
         }
-        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(15);
-
-        //System.out.println(petri.cualessensibilizadas());
         Imagen to_export = bufferlistas.getImagen();
-
         mutex.release();
         return to_export;
     }
@@ -277,16 +284,13 @@ public class Monitor {
                 break;
             mutex.release();
         }
-
-        //System.out.println(petri.cualessensibilizadas());
         petri.disparar(16);
-
-        //System.out.println(petri.cualessensibilizadas());
         bufferexportadas.agregar(img);
         s_exporta.release();
         mutex.release();
 
         exportadas++;
-        //System.out.println("se exportaron " + exportadas);
+        System.out.println("se exportaron " + exportadas);
+        petri.imprimircontador();
     }
 }

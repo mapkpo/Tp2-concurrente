@@ -15,7 +15,7 @@ public class Creador implements Runnable{
             //Duerme para representar el tiempo que le tomaría crear una nueva imagen.
             try{
                 //System.out.println(threadName + ": Intentando crear una nueva imagen.");
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }

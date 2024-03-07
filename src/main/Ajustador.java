@@ -18,7 +18,7 @@ public class Ajustador implements Runnable{
 
             //System.out.println(threadName + ": Iniciando ajuste inicial.");
             try{
-                Thread.sleep(1000);
+                Thread.sleep(1);
             } catch (InterruptedException ex){
                 System.out.println(ex.getMessage());
             }
