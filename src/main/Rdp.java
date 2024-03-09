@@ -36,7 +36,7 @@ public class Rdp {
     private final double[] marcadoinicial = {0, 1, 0, 3, 0, 1, 0, 1, 0, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1};
     private final double[] transicionm = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     List<Integer> transicionsleeptime = Collections.unmodifiableList
-            (Arrays.asList(10, 0, 0, 50, 50, 0, 0, 100, 100, 100, 100, 0, 0, 500, 500, 0, 100));
+            (Arrays.asList(100, 0, 0, 50, 50, 0, 0, 100, 100, 100, 100, 0, 0, 500, 500, 0, 100));
     private final long[] transiciontime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private final int[] contadordedisparos = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -44,7 +44,9 @@ public class Rdp {
     String secuencia = "";
 
     public Rdp() {
-        Arrays.fill(transiciontime, System.currentTimeMillis());
+        //-1 significa que la transicion no esta sensibilizada por lo que el tiempo aun no corre.
+        Arrays.fill(transiciontime, -1);
+        transiciontime[0] = System.currentTimeMillis();
     }
 
     private final RealMatrix incidencia = MatrixUtils.createRealMatrix(incidenciam);
@@ -54,8 +56,6 @@ public class Rdp {
 
     public boolean issensibilizada(int a){
         if(a>=0 && a<transicion.getDimension()) {
-            if(System.currentTimeMillis() - transiciontime[a] < transicionsleeptime.get(a))
-                return false;
             RealVector adisparar = transicion.copy();
             adisparar.setEntry(a, 1);
 
@@ -65,7 +65,10 @@ public class Rdp {
                     return false;
                 }
             }
-            return true;
+
+            if (transiciontime[a] == -1)
+                transiciontime[a] = System.currentTimeMillis();
+            return (System.currentTimeMillis() - transiciontime[a] > transicionsleeptime.get(a));
         }
         System.out.println(a + "esta fuera de rango");
         return false;
@@ -103,7 +106,9 @@ public class Rdp {
             RealVector nuevomarcado = incidencia.operate(adisparar1).add(marcado);
             actualizarmarcado(nuevomarcado);
 
-            transiciontime[a] = System.currentTimeMillis();
+            transiciontime[a] = -1;
+            issensibilizada(a);
+
             secuencia += a + " - ";
 
             contadordedisparos[a]++;
