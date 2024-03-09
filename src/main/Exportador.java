@@ -16,14 +16,6 @@ public class Exportador implements Runnable{
             //System.out.println(threadName + ": Buscando imagen para exportar.");
             Imagen img = monitor.startexporte();
 
-            //System.out.println(threadName + ": Iniciando exporte.");
-            //Simula tiempo de carga.
-            try{
-                Thread.sleep(1);
-            } catch (InterruptedException ex){
-                System.out.println(ex.getMessage());
-            }
-
             monitor.finishexport(img);
             //System.out.println(threadName + ": Imagen exportada exitósamente.");
         }

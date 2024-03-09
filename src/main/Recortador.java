@@ -18,11 +18,6 @@ public class Recortador implements Runnable{
             Imagen img = monitor.startrecorte();
 
             //System.out.println(threadName + ": Inciando recorte.");
-            try{
-                Thread.sleep(1);
-            } catch (InterruptedException ex){
-                System.out.println(ex.getMessage());
-            }
 
             img.recortar();
             monitor.finishrecorte(img);

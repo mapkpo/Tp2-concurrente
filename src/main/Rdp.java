@@ -1,10 +1,13 @@
 package main;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.linear.ArrayRealVector;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 public class Rdp {
     private final double[][] incidenciam = {
@@ -32,10 +35,16 @@ public class Rdp {
     };
     private final double[] marcadoinicial = {0, 1, 0, 3, 0, 1, 0, 1, 0, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1};
     private final double[] transicionm = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    List<Integer> transicionsleeptime = Collections.unmodifiableList
+            (Arrays.asList(10, 0, 0, 50, 50, 0, 0, 100, 100, 100, 100, 0, 0, 500, 500, 0, 100));
+    private final long[] transiciontime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private final int[] contadordedisparos = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+    String secuencia = "";
+
     public Rdp() {
+        Arrays.fill(transiciontime, System.currentTimeMillis());
     }
 
     private final RealMatrix incidencia = MatrixUtils.createRealMatrix(incidenciam);
@@ -45,6 +54,8 @@ public class Rdp {
 
     public boolean issensibilizada(int a){
         if(a>=0 && a<transicion.getDimension()) {
+            if(System.currentTimeMillis() - transiciontime[a] < transicionsleeptime.get(a))
+                return false;
             RealVector adisparar = transicion.copy();
             adisparar.setEntry(a, 1);
 
@@ -55,8 +66,8 @@ public class Rdp {
                 }
             }
             return true;
-    }
-        System.out.println("Fuera de rango");
+        }
+        System.out.println(a + "esta fuera de rango");
         return false;
     }
 
@@ -84,26 +95,18 @@ public class Rdp {
     }
 
     public void disparar(int a){
-        if (a < transicionm.length){
-            if(issensibilizada(a)){
-                RealVector adisparar1 = transicion.copy();
+        if(issensibilizada(a)){
+            RealVector adisparar1 = transicion.copy();
 
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            adisparar1.setEntry(a, 1);
 
-                adisparar1.setEntry(a, 1);
+            RealVector nuevomarcado = incidencia.operate(adisparar1).add(marcado);
+            actualizarmarcado(nuevomarcado);
 
-                RealVector nuevomarcado = incidencia.operate(adisparar1).add(marcado);
-                actualizarmarcado(nuevomarcado);
+            transiciontime[a] = System.currentTimeMillis();
+            secuencia += a + " - ";
 
-                contadordedisparos[a]++;
-            }
-        }
-        else {
-            System.out.println("Fuera de rango");
+            contadordedisparos[a]++;
         }
     }
 
@@ -123,7 +126,8 @@ public class Rdp {
             System.out.print(",");
             System.out.print(contadordedisparos[14]);
         //}
-        System.out.println("");
+        System.out.println();
+        System.out.println("secuencia: " + secuencia);
     }
 
 }

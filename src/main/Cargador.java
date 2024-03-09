@@ -16,14 +16,6 @@ public class Cargador implements Runnable{
             //System.out.println(threadName + ": Buscando imagen para cargar.");
             Imagen img = monitor.startcarga();
 
-            //System.out.println(threadName + ": Iniciando carga.");
-            //Simula tiempo de carga.
-            try{
-                Thread.sleep(1);
-            } catch (InterruptedException ex){
-                System.out.println(ex.getMessage());
-            }
-
             monitor.finishcarga(img);
             //System.out.println(threadName + ": Imagen cargada exitósamente.");
         }

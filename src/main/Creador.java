@@ -4,29 +4,21 @@ public class Creador implements Runnable{
 
     final Monitor monitor;
     String threadName;
-    public Creador(Monitor monitor) {
+    final int max;
+    public Creador(Monitor monitor, int max) {
         this.monitor = monitor;
+        this.max = max;
     }
 
     @Override
     public void run() {
         threadName = Thread.currentThread().getName();
-        while (true){
-            //Duerme para representar el tiempo que le tomaría crear una nueva imagen.
-            try{
-                //System.out.println(threadName + ": Intentando crear una nueva imagen.");
-                Thread.sleep(1);
-            } catch (InterruptedException ex){
-                System.out.println(ex.getMessage());
-            }
-
-            //System.out.println(threadName + ": Nueva imagen creada con éxito.");
-            //System.out.println(threadName + ": Intentando pasar nueva imagen al sistema.");
-
+        int count = 0;
+        while (count != max){
             //Espera a poder tomar control del mutex del monitor para agregar la imagen al contenedor P0.
             monitor.addimagen(new Imagen());
-
-            //System.out.println(threadName + ": Nueva imagen agregada con éxito.");
+            //System.out.println(threadName + ": Nueva imagen creada con éxito.");
+            count++;
         }
     }
 }

@@ -12,15 +12,13 @@ public class Monitor {
     final private Semaphore s_ajuste;
     final private Semaphore s_recorte;
     final private Semaphore s_exporta;
-
-    private String politica;
-
-
-    //final private Semaphore s_create; //redundante
+    final private String politica;
+    final private Semaphore s_create;
 
 
     private int exportadas;
-
+    long starttime;
+    long endtime;
 
 
     Contenedor bufferentrada = new Contenedor();     //P0
@@ -30,18 +28,18 @@ public class Monitor {
     Contenedor bufferexportadas = new Contenedor();   //OUTPUT
 
 
-    public Monitor(String a){
+    public Monitor(String _politica){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
         s_proc = new Semaphore(3);          //P3
         s_ajuste = new Semaphore(2);        //P9
         s_recorte = new Semaphore(1);       //P15
         s_exporta = new Semaphore(1);       //P20
-        politica = a;
-
-        //s_create = new Semaphore(1); //creo que es redundante 
+        politica = _politica;
+        s_create = new Semaphore(1); //creo que es redundante
 
         exportadas = 0;
+        starttime = System.currentTimeMillis();
     }
 
     /* Trys to acquire the mutex. */
@@ -55,45 +53,29 @@ public class Monitor {
 
     /* T0: Agrega una imagen al buffer de entrada. */
     public void addimagen(Imagen img) {
-        //Todo: usar un semaforo para bloquear la adicion de mas imagenes
-        //  cuando se puedan hacer otras cosas (s_create).
-        getmutex();
-        //No reviso si T0 esta sensibilizada porque ya sabemos que siempre esta sensibilizada
-        bufferentrada.agregar(img);
-        //System.out.println("imagen agregada");
-        petri.disparar(0);
-        mutex.release();
-    }
-
-    /**
-     * prueba con el semaforo para s_create
-    
-    public void addimagen(Imagen imagen){
         while(true){
-
-            try{
+            /*try{
                 s_create.acquire();
             } catch (InterruptedException e){
-                System.out.println("Monitor: interrupted while trying to acquire s_create: " + e);
-            }
+                System.out.println("Monitor: interrupted while trying to acquire mutex: " + e);
+            }*/
             getmutex();
-            break;
+            if(petri.issensibilizada(0))
+                break;
+            //s_create.release();
+            mutex.release();
         }
 
-        bufferentrada.agregar(imagen);
         petri.disparar(0);
-        System.out.println("imagen agregada");
-
-        mutex.release();
+        bufferentrada.agregar(img);
         s_create.release();
-    }*/
+        mutex.release();
+    }
 
     /* T1|T2: Toma una imagen del buffer de entrada. */
     public Imagen startcarga() {
         int T = 1;
         while(true){
-            //Todo: Quizas agregar otro semaforo que simule P3 para evitar que bloquee los
-            // otros semaforos si no va a poder hacer nada.
             try{
                 s_proc.acquire();
             } catch (InterruptedException e){
@@ -284,13 +266,14 @@ public class Monitor {
                 break;
             mutex.release();
         }
+        endtime = System.currentTimeMillis();
         petri.disparar(16);
         bufferexportadas.agregar(img);
-        s_exporta.release();
-        mutex.release();
-
         exportadas++;
         System.out.println("se exportaron " + exportadas);
+        System.out.println("en " + (endtime - starttime) + " milisegundos");
         petri.imprimircontador();
+        s_exporta.release();
+        mutex.release();
     }
 }
