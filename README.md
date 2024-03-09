@@ -4,7 +4,8 @@
 
 ## cosas a hacer
 
-- clase cargador
-- clase ajustador
-- clase recortador
-- clase exportador
+- log (hilo daemon)
+- analisis de tiempo
+- comprobacion de invarables
+- comprobacion de cantidad de tokens en las plazas (punto 7)
+- explicacion de politicas
