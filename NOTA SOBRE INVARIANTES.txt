@@ -1,0 +1,1 @@
+notese que no puse el invariante de plaza de p0 ya que nuestro p0 puede tener un valor mayor a 1 porque siempre estamos creando imagenes
