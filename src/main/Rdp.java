@@ -11,32 +11,39 @@ import java.util.Collections;
 import java.util.List;
 public class Rdp {
     private final double[][] incidenciam = {
-            {1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-            {0, -1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-            {0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-            {0, -1, -1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1},
-            {0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-            {0,  0, -1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0, -1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0, -1, -1,  0,  0,  1,  1,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0,  0, -1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0},
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1,  1,  1,  0,  0},
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0},
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0},
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1,  0},
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, -1},
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, 1}
+
+        //  t0  t1  t2   t3  t4  t5  t6  t7  t8  t9  t10 t11 t12 t13 t14 t15 t16
+            {1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p0
+            {0, -1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p1
+            {0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p2
+            {0, -1, -1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1}, //p3
+            {0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p4
+            {0,  0, -1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p5
+            {0,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p6
+            {0,  0,  0,  0,  0, -1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0}, //p7
+            {0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p8
+            {0,  0,  0,  0,  0, -1, -1,  0,  0,  1,  1,  0,  0,  0,  0,  0,  0}, //p9
+            {0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0}, //p10
+            {0,  0,  0,  0,  0,  0, -1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0}, //p11
+            {0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0}, //p12
+            {0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0}, //p13
+            {0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0}, //p14
+            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1,  1,  1,  0,  0}, //p15
+            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0}, //p16
+            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0}, //p17
+            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1,  0}, //p18
+            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, -1}, //p19
+            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1}  //p20
     };
+
+                                        //p  0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20
     private final double[] marcadoinicial = {0, 1, 0, 3, 0, 1, 0, 1, 0, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+
     private final double[] transicionm = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
     List<Integer> transicionsleeptime = Collections.unmodifiableList
             (Arrays.asList(100, 0, 0, 100, 100, 0, 0, 100, 100, 100, 100, 0, 0, 100, 100, 0, 100));
+
     private final long[] transiciontime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private final int[] contadordedisparos = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -98,6 +105,7 @@ public class Rdp {
     }
 
     public void disparar(int a){
+        testinvarianteplaza();
         if(issensibilizada(a)){
             RealVector adisparar1 = transicion.copy();
 
@@ -127,12 +135,40 @@ public class Rdp {
 
     public void imprimircontador(){
         //for(int i=0; i<17; i++){
+            System.out.print("contador del balanceo de la politica: ");
             System.out.print(contadordedisparos[13]);
-            System.out.print(",");
+            System.out.print(" , ");
             System.out.print(contadordedisparos[14]);
         //}
         System.out.println();
         System.out.println("secuencia: " + secuencia);
     }
 
+    private void testinvarianteplaza(){
+        boolean p1, p2, p3, p4, p5, p6, p7, p8;
+
+        /*
+        for(int i=0; i<21; i++){
+            System.out.print("plaza: "+i+""+marcado.getEntry(i)+" , ");
+        }
+        System.out.println();
+        */
+
+        p1 = ((((int)marcado.getEntry(1))+((int)marcado.getEntry(2))) == 1);
+        p2 = ((((int)marcado.getEntry(4))+((int)marcado.getEntry(5))) == 1);
+        p3 = ((((int)marcado.getEntry(19))+((int)marcado.getEntry(20))) == 1);
+        p4 = ((((int)marcado.getEntry(15))+((int)marcado.getEntry(16))+((int)marcado.getEntry(17))) == 1);
+        p4 = ((((int)marcado.getEntry(7))+((int)marcado.getEntry(8))+((int)marcado.getEntry(12))) == 1);
+        p5 = ((((int)marcado.getEntry(15))+((int)marcado.getEntry(16))+((int)marcado.getEntry(17))) == 1);
+        p6 = ((((int)marcado.getEntry(10))+((int)marcado.getEntry(11))+((int)marcado.getEntry(13))) == 1);
+        p7 = ((((int)marcado.getEntry(8))+((int)marcado.getEntry(9))+((int)marcado.getEntry(10))+((int)marcado.getEntry(12))+((int)marcado.getEntry(13))) == 2);
+        p8 = ((((int)marcado.getEntry(2))+((int)marcado.getEntry(3))+((int)marcado.getEntry(4))+((int)marcado.getEntry(19))) == 3);
+
+        if (!(p1 && p2 && p3 && p4 && p5 && p6 && p7 && p8)){
+       
+            System.out.println("ERROR EN INVARIANTE DE TRANSICION, CERRANDO EJECUCION.");
+            System.exit(0);
+        }
+        
+    }
 }

@@ -5,7 +5,7 @@ public class Main {
 
         Monitor monitor = new Monitor("5050");
 
-        Creador creador = new Creador(monitor, 4);
+        Creador creador = new Creador(monitor, 100);
 
         Cargador cargador = new Cargador(monitor);
         Cargador cargador1 = new Cargador(monitor);
