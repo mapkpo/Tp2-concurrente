@@ -1,1 +1,10 @@
 notese que no puse el invariante de plaza de p0 ya que nuestro p0 puede tener un valor mayor a 1 porque siempre estamos creando imagenes
+
+p1+p2=1
+p4+p5=1
+p7+p8+p12=1
+p19+p20=1
+p11+p10+p13=1
+p15+p16+p17=1
+p8+p9+p10+p12+p13=2
+p2+p3+p4+p19=3
