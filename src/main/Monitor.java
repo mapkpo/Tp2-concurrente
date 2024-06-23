@@ -1,8 +1,6 @@
 package main;
 import java.util.concurrent.Semaphore;
 
-import java.util.Random;
-
 public class Monitor {
     final private Rdp petri;
     final private Semaphore mutex;
@@ -12,15 +10,14 @@ public class Monitor {
     final private Semaphore s_ajuste;
     final private Semaphore s_recorte;
     final private Semaphore s_exporta;
-    final private String politica;
+    final private Politica politica;
     final private Semaphore s_create;
 
 
     private int exportadas;
     long starttime;
     long endtime;
-
-
+   
     Contenedor bufferentrada = new Contenedor();     //P0
     Contenedor bufferaprocesar = new Contenedor();  //P6
     Contenedor bufferajustadas = new Contenedor();   //P14
@@ -28,7 +25,7 @@ public class Monitor {
     Contenedor bufferexportadas = new Contenedor();   //OUTPUT
 
 
-    public Monitor(String _politica){
+    public Monitor(Politica _politica){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
         s_proc = new Semaphore(3);          //P3
@@ -177,7 +174,7 @@ public class Monitor {
         mutex.release();
     }
 
-    /* T11|T122: Toma una imagen para ser recortada. */
+    /* T11|T12: Toma una imagen para ser recortada. */
     public Imagen startrecorte(){
         int T;
         while (true){
@@ -187,27 +184,10 @@ public class Monitor {
                 System.out.println("Monitor: interrupted while trying to acquire s_recorte: " + e);
             }
             getmutex();
-
-            Random rand = new Random();
-            double probabilidad = rand.nextDouble();
             
             if(petri.issensibilizada(11) && petri.issensibilizada(12)){
-                if(politica.equals("8020")){
-                    if (probabilidad < 0.8){
-                        T = 11;
-                        break;
-                    } else {
-                        T = 12;
-                        break;
-                    }
-                }
-                if(probabilidad < 0.5){
-                    T = 11;
-                    break;
-                } else {
-                    T = 12;
-                    break;
-                }
+                T = politica.numerodetransicion();
+                break;
             }
 
             s_recorte.release();

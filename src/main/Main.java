@@ -3,9 +3,11 @@ package main;
 public class Main {
     public static void main(String[] args) {
 
-        Monitor monitor = new Monitor("5050");
+        Politica politica = new Politica(1);
 
-        Creador creador = new Creador(monitor, 100);
+        Monitor monitor = new Monitor(politica);
+
+        Creador creador = new Creador(monitor, 200);
 
         Cargador cargador = new Cargador(monitor);
         Cargador cargador1 = new Cargador(monitor);
