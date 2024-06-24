@@ -1,11 +1,13 @@
-# Tp2-concurrente
-
-- https://drive.google.com/drive/u/1/folders/1EaoqU-XaBNIYEEj9CE8ggGr51XNpFXsZ
-
 ## cosas a hacer
 
 - log (hilo daemon)
 - analisis de tiempo
 - comprobacion de invarables
 - comprobacion de cantidad de tokens en las plazas (punto 7)
-- explicacion de politicas
+
+## dudas
+- deberiamos usar una bandera y parar los hilos cuando se completen
+- los 200 invariantes? (crear una bandera que se cambie y
+- el main comience a matar a los hilos para finalizar ejecución)
+- deberiamos cambiar el limite de los 200 al exportador y dejar
+- que el creador cree infinitamente?
