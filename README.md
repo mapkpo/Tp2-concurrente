@@ -9,4 +9,3 @@
 - comprobacion de invarables
 - comprobacion de cantidad de tokens en las plazas (punto 7)
 - explicacion de politicas
-- la politica debe ser un objeto, es necesario crear una clase "politica" 
