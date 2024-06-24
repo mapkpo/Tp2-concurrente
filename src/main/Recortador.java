@@ -3,9 +3,11 @@ package main;
 public class Recortador implements Runnable{
     final Monitor monitor;
     String threadName;
+    private int contador;
 
     public Recortador(Monitor monitor) {
         this.monitor = monitor;
+        contador = 0;
     }
 
     @Override
@@ -22,6 +24,11 @@ public class Recortador implements Runnable{
             img.recortar();
             monitor.finishrecorte(img);
            // System.out.println(threadName + ": Imagen recortada exitosamente.");
+            contador++;
         }
+    }
+
+    public int getContador(){
+        return contador;
     }
 }

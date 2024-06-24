@@ -3,12 +3,14 @@ package main;
 public class Main {
     public static void main(String[] args) {
 
-        Politica politica = new Politica(1);
+        int setpolitica = 1;     //politica 1 es 50/50, 2 es 80/20
+        int numerodeimagenesaprocesar = 20;
+
+        Politica politica = new Politica(setpolitica); 
 
         Monitor monitor = new Monitor(politica);
 
-        Creador creador = new Creador(monitor, 200);
-
+        Creador creador = new Creador(monitor,numerodeimagenesaprocesar);
         Cargador cargador = new Cargador(monitor);
         Cargador cargador1 = new Cargador(monitor);
         Ajustador ajustador = new Ajustador(monitor);

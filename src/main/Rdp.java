@@ -48,7 +48,7 @@ public class Rdp {
 
     private final int[] contadordedisparos = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    String secuencia = "";
+    private String secuencia = "";
 
     public Rdp() {
         //-1 significa que la transicion no esta sensibilizada por lo que el tiempo aun no corre.
@@ -117,7 +117,7 @@ public class Rdp {
             transiciontime[a] = -1;
             issensibilizada(a);
 
-            secuencia += "T" + a;
+            secuencia += "T" + a + "-";
 
             contadordedisparos[a]++;
         }
