@@ -15,7 +15,7 @@ public class Monitor {
     
 
     private boolean invariantescompletados = false; //bandera para parar hilos
-    private int exportadas;
+    private int exportadas; // borrar
     long starttime;
     long endtime;
    
@@ -250,10 +250,10 @@ public class Monitor {
         endtime = System.currentTimeMillis();
         petri.disparar(16);
         bufferexportadas.agregar(img);
-        exportadas++;
-        System.out.println("se exportaron " + exportadas);
-        System.out.println("en " + (endtime - starttime) + " milisegundos");
-        petri.imprimircontador();
+        exportadas++; // borrar y lo de abajao tambien
+        //System.out.println("se exportaron " + exportadas);
+        //System.out.println("en " + (endtime - starttime) + " milisegundos");
+        //petri.imprimircontador();
         s_exporta.release();
         mutex.release();
     }
@@ -265,5 +265,29 @@ public class Monitor {
     public void finalizar(){
         invariantescompletados = true;
         System.out.print(petri.getSecuencia());
+    }
+
+    public String getSecuencia(){
+        return petri.getSecuencia();
+    }
+
+    public int getBufferP0(){
+        return bufferentrada.getAgregadas();
+    }
+
+    public int getBufferP6(){
+        return bufferaprocesar.getAgregadas();
+    }
+
+    public int getBufferP14(){
+        return bufferajustadas.getAgregadas();
+    }
+
+    public int getBufferP18(){
+        return bufferlistas.getAgregadas();
+    }
+
+    public int getBufferExportadas(){
+        return bufferexportadas.getAgregadas();
     }
 }

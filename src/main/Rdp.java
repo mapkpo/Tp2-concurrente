@@ -134,14 +134,11 @@ public class Rdp {
     }
 
     public void imprimircontador(){
-        //for(int i=0; i<17; i++){
             System.out.print("contador del balanceo de la politica: ");
             System.out.print(contadordedisparos[13]);
             System.out.print(" , ");
             System.out.print(contadordedisparos[14]);
-        //}
-        System.out.println();
-        //System.out.println("secuencia: " + secuencia);
+            System.out.println();
     }
 
     private void testinvarianteplaza(){
