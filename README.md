@@ -1,6 +1,5 @@
 ## cosas a hacer
 
-- log (hilo daemon)
 - analisis de tiempo
 - comprobacion de invarables
 - comprobacion de cantidad de tokens en las plazas (punto 7)
