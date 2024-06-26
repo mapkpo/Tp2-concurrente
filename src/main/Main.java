@@ -11,7 +11,6 @@ public class Main {
         Politica politica = new Politica(setpolitica); 
         Monitor monitor = new Monitor(politica);
 
-        //usando el patron factory thread así ludemman puede romper el codigo mas fácil jaja
         Creador[] creador = new Creador[numhilos2];
         Thread[] threadCreador = new Thread[numhilos2];
 
