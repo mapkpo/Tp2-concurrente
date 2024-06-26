@@ -15,7 +15,6 @@ public class Monitor {
     
 
     private boolean invariantescompletados = false; //bandera para parar hilos
-    private int exportadas; // borrar
     long starttime;
     long endtime;
    
@@ -36,7 +35,6 @@ public class Monitor {
         politica = _politica;
         s_create = new Semaphore(1); //creo que es redundante
 
-        exportadas = 0;
         starttime = System.currentTimeMillis();
     }
 
@@ -250,10 +248,6 @@ public class Monitor {
         endtime = System.currentTimeMillis();
         petri.disparar(16);
         bufferexportadas.agregar(img);
-        exportadas++; // borrar y lo de abajao tambien
-        //System.out.println("se exportaron " + exportadas);
-        //System.out.println("en " + (endtime - starttime) + " milisegundos");
-        //petri.imprimircontador();
         s_exporta.release();
         mutex.release();
     }
