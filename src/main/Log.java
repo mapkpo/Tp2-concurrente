@@ -59,7 +59,7 @@ public class Log implements Runnable {
         }
         this.contador++;
         escribir_archivo();
-
+        escribir_secuencia();
     }
 
 
@@ -102,7 +102,22 @@ public class Log implements Runnable {
         }
     }
 
-
-
-    
+    private void escribir_secuencia(){
+        try {
+            FileWriter escribir = new FileWriter(archivo, true);
+            try {
+                escribir.write("Secuencia: "+ monitor.getSecuencia() +"\n");
+                
+                escribir.write("\n\n");
+            }
+            catch (IOException e){
+                System.out.println("Problema al escribir en el archivo de LOG.");
+            }
+            finally {
+                escribir.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
