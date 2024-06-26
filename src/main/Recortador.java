@@ -1,5 +1,7 @@
 package main;
 
+import java.util.concurrent.TimeUnit;
+
 public class Recortador implements Runnable{
     final Monitor monitor;
     String threadName;
@@ -14,8 +16,9 @@ public class Recortador implements Runnable{
     public void run() {
 
         threadName = Thread.currentThread().getName();
+        System.out.printf("%s inicializado\n", threadName);
 
-        while (true){
+        while (!monitor.finalizarquestion()){
             //System.out.println(threadName + ": Buscando imagen para recortar.");
             Imagen img = monitor.startrecorte();
 
@@ -25,6 +28,12 @@ public class Recortador implements Runnable{
             monitor.finishrecorte(img);
            // System.out.println(threadName + ": Imagen recortada exitosamente.");
             contador++;
+
+             try{
+                TimeUnit.MILLISECONDS.sleep(0);
+            } catch(InterruptedException e){
+                e.printStackTrace();
+            }
         }
     }
 

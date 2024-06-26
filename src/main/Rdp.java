@@ -117,7 +117,7 @@ public class Rdp {
             transiciontime[a] = -1;
             issensibilizada(a);
 
-            //secuencia += "T" + a + "-";
+            secuencia += "T" + a + "-";
 
             contadordedisparos[a]++;
         }
@@ -169,6 +169,9 @@ public class Rdp {
             System.out.println("ERROR EN INVARIANTE DE TRANSICION, CERRANDO EJECUCION.");
             System.exit(0);
         }
-        
+    }
+
+    public String getSecuencia(){
+        return secuencia;
     }
 }

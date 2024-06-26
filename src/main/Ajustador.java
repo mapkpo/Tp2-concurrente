@@ -13,8 +13,9 @@ public class Ajustador implements Runnable{
     @Override
     public void run() {
         threadName = Thread.currentThread().getName();
+        System.out.printf("%s inicializado\n", threadName);
 
-        while (true){
+        while (!monitor.finalizarquestion()){
             //System.out.println(threadName + ": Buscando imagen para ajustar.");
             Imagen img = monitor.startajuste();
 

@@ -4,7 +4,7 @@ public class Main {
     public static void main(String[] args) {
 
         final int setpolitica = 1;     //politica 1 es 50/50, 2 es 80/20
-        final int numerodeimagenesaprocesar = 200;
+        final int numerodeimagenesaprocesar = 200;  //numero de invariantes que buscamos, 
         final int numhilos1 = 2;    //cargador, ajustador, recortador
         final int numhilos2 = 1;    //creador, exportador
 
@@ -42,11 +42,11 @@ public class Main {
         }
 
         for(int i = 0; i < numhilos2; i++){
-            creador[i] = new Creador(monitor, numerodeimagenesaprocesar);
+            creador[i] = new Creador(monitor);
             threadCreador[i] = new Thread(creador[i]);
             threadCreador[i].setName("Creador: " + i);
 
-            exportador[i] = new Exportador(monitor);
+            exportador[i] = new Exportador(monitor, numerodeimagenesaprocesar);
             threadExportador[i] = new Thread(exportador[i]);
             threadExportador[i].setName("Exportador: " + i);
         }

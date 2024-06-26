@@ -12,8 +12,9 @@ public class Monitor {
     final private Semaphore s_exporta;
     final private Politica politica;
     final private Semaphore s_create;
+    
 
-
+    private boolean invariantescompletados = false; //bandera para parar hilos
     private int exportadas;
     long starttime;
     long endtime;
@@ -255,5 +256,14 @@ public class Monitor {
         petri.imprimircontador();
         s_exporta.release();
         mutex.release();
+    }
+
+    public boolean finalizarquestion(){
+        return invariantescompletados;
+    }
+
+    public void finalizar(){
+        invariantescompletados = true;
+        System.out.print(petri.getSecuencia());
     }
 }

@@ -5,5 +5,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Log implements Runnable {
+    int contador;
+    Thread[] threadCreador;
+    Thread[] threadCargadores;
+    Thread[] threadAjustadores;
+    Thread[] threadRecortadores;
+    Thread[] threadExportador;
+    File archivo;
     
+    public Log(Thread[] threadCreador,Thread[] threadCargadores,Thread[] threadAjustadores,Thread[] threadRecortadores,Thread[] threadExportador;){
+        
+    }
 }
