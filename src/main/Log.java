@@ -14,6 +14,7 @@ public class Log implements Runnable {
     Thread[] threadExportador;
     Monitor monitor;
     File archivo;
+    File archivo1;
     
     public Log(Thread[] threadCreador,Thread[] threadCargadores,Thread[] threadAjustadores,Thread[] threadRecortadores,Thread[] threadExportador, Monitor monitor){
         this.threadCreador = threadCreador;
@@ -43,6 +44,25 @@ public class Log implements Runnable {
         catch (IOException e) {
             System.out.println("Problema al crear el archivo de LOG.");
         }
+
+        File directorio1 = new File("./Secuencia");
+        if(!directorio1.exists()){
+            if (directorio1.mkdirs()) {
+            }
+            else {
+                System.out.println("Error al crear directorio");
+            }
+        }
+        try {
+            String nombreArchivo1 = ("Secuencia") + ".txt";
+            archivo1 = new File(directorio1, nombreArchivo1);
+            if (!archivo1.exists()) {
+                archivo1.createNewFile();
+            }
+        }
+        catch (IOException e) {
+            System.out.println("Problema al crear el archivo de LOG.");
+        }
     }
 
     @Override
@@ -59,7 +79,8 @@ public class Log implements Runnable {
         }
         this.contador++;
         escribir_archivo();
-        escribir_secuencia();
+        escribir_secuencialog();
+        escribir_secuenciasola();
     }
 
 
@@ -103,7 +124,7 @@ public class Log implements Runnable {
         }
     }
 
-    private void escribir_secuencia(){
+    private void escribir_secuencialog(){
         try {
             FileWriter escribir = new FileWriter(archivo, true);
             try {
@@ -111,6 +132,23 @@ public class Log implements Runnable {
                 
                 escribir.write("\n\n");
             }
+            catch (IOException e){
+                System.out.println("Problema al escribir en el archivo de LOG.");
+            }
+            finally {
+                escribir.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void escribir_secuenciasola(){
+        try {
+            FileWriter escribir = new FileWriter(archivo1, false);
+            try {
+                escribir.write(monitor.getSecuencia());
+                }
             catch (IOException e){
                 System.out.println("Problema al escribir en el archivo de LOG.");
             }
