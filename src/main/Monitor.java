@@ -258,7 +258,9 @@ public class Monitor {
 
     public void finalizar(){
         invariantescompletados = true;
-        System.out.print(petri.getSecuencia());
+        System.out.println("Programa finalizado con: " + getBufferExportadas() + " invariantes");
+        petri.imprimircontador();
+        //System.out.print(petri.getSecuencia());
     }
 
     public String getSecuencia(){
@@ -283,5 +285,9 @@ public class Monitor {
 
     public int getBufferExportadas(){
         return bufferexportadas.getAgregadas();
+    }
+
+    public String getContadorBalanceo(){
+        return petri.contadorString();
     }
 }

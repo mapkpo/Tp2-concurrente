@@ -73,6 +73,7 @@ public class Log implements Runnable {
                 escribir.write("Imagenes ajustadas: "+ monitor.getBufferP14() +"\n");
                 escribir.write("Imagenes recortadas: "+ monitor.getBufferP18() +"\n");
                 escribir.write("Imagenes exportadas: "+ monitor.getBufferExportadas() +"\n");
+                escribir.write(monitor.getContadorBalanceo() +"\n");
 
                 for (Thread thread:threadCreador){
                     escribir.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");

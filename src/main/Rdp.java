@@ -133,12 +133,17 @@ public class Rdp {
         }
     }
 
-    public void imprimircontador(){
-            System.out.print("contador del balanceo de la politica: ");
-            System.out.print(contadordedisparos[13]);
+    public void imprimircontador(){ //este valor siempre va a ser mayor al numero de invariantes deseados debido a que la red 
+        //se sigue disparando hasta que se paran todos los hilos.
+            System.out.print("Contador del balanceo de la politica: ");
+            System.out.print(contadordedisparos[11]);
             System.out.print(" , ");
-            System.out.print(contadordedisparos[14]);
+            System.out.print(contadordedisparos[12]);
             System.out.println();
+    }
+
+    public String contadorString(){
+        return ("Contador del balanceo de la politica: "+contadordedisparos[11]+" , "+contadordedisparos[12]);
     }
 
     private void testinvarianteplaza(){
