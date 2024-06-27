@@ -4,7 +4,7 @@ public class Main {
     public static void main(String[] args) {
 
         final int setpolitica = 1;     //politica 1 es 50/50, 2 es 80/20
-        final int numerodeimagenesaprocesar = 10;  //numero de invariantes que buscamos, POR ALGUNA RAZON CON MENOS DE 19 SE ROMPE LA EXPRESION REGULAR AL ANALIZAR XDDDDD  
+        final int numerodeimagenesaprocesar = 200;  //numero de invariantes que buscamos
         final int numhilos1 = 2;    //cargador, ajustador, recortador
         final int numhilos2 = 1;    //creador, exportador
 

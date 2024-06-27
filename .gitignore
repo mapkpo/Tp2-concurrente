@@ -27,6 +27,7 @@ bin/
 /Logs
 /out
 /out/
+/Secuencia
 
 ### Mac OS ###
 .DS_Store
