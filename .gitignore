@@ -28,6 +28,7 @@ bin/
 /out
 /out/
 /Secuencia
+/Secuencia/
 
 ### Mac OS ###
 .DS_Store

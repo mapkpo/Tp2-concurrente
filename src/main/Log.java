@@ -147,7 +147,7 @@ public class Log implements Runnable {
         try {
             FileWriter escribir = new FileWriter(archivo1, false);
             try {
-                escribir.write(monitor.getSecuencia());
+                escribir.write(monitor.getSecuencia()+"\n");
                 }
             catch (IOException e){
                 System.out.println("Problema al escribir en el archivo de LOG.");
