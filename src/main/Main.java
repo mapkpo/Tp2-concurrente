@@ -4,14 +4,13 @@ public class Main {
     public static void main(String[] args) {
 
         final int setpolitica = 1;     //politica 1 es 50/50, 2 es 80/20
-        final int numerodeimagenesaprocesar = 20;  //numero de invariantes que buscamos, 
+        final int numerodeimagenesaprocesar = 5;  //numero de invariantes que buscamos, POR ALGUNA RAZON CON MENOS DE 19 SE ROMPE LA EXPRESION REGULAR AL ANALIZAR XDDDDD  
         final int numhilos1 = 2;    //cargador, ajustador, recortador
         final int numhilos2 = 1;    //creador, exportador
 
         Politica politica = new Politica(setpolitica); 
         Monitor monitor = new Monitor(politica);
 
-        //usando el patron factory thread así ludemman puede romper el codigo mas fácil jaja
         Creador[] creador = new Creador[numhilos2];
         Thread[] threadCreador = new Thread[numhilos2];
 

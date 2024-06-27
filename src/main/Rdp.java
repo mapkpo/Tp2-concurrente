@@ -117,7 +117,7 @@ public class Rdp {
             transiciontime[a] = -1;
             issensibilizada(a);
 
-            secuencia += "T" + a + "-";
+            secuencia += "T" + a;
 
             contadordedisparos[a]++;
         }
