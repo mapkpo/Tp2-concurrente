@@ -3,6 +3,7 @@
 - analisis de tiempo
 - comprobacion de invarables
 - comprobacion de cantidad de tokens en las plazas (punto 7)
+- se rompe el regex con menos de 20 imagenes
 
 ## dudas
 - deberiamos usar una bandera y parar los hilos cuando se completen
