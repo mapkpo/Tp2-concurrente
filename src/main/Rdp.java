@@ -117,7 +117,14 @@ public class Rdp {
             transiciontime[a] = -1;
             issensibilizada(a);
 
-            secuencia += "T" + a;
+            //sin hacer esto el programa de python para comprobar la expresion regular aveces (20% del tiempo) falla ya que se come una T0 y lo deja como 0 solo, entonces
+            //interpreta un invariante menos debido a ese error, haciendo que sea T00 se soluciona y funciona siempre
+            if(a<10){
+                secuencia += "T0" + a;
+            } 
+            else {
+                secuencia += "T" + a; 
+            }
 
             contadordedisparos[a]++;
         }
