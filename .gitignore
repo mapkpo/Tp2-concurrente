@@ -29,7 +29,7 @@ bin/
 /out/
 /Secuencia
 /Secuencia/
-/Secuencia/Secuencia.txt
+\Secuencia
 
 ### Mac OS ###
 .DS_Store
