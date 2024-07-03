@@ -48,7 +48,7 @@ public class Rdp {
 
     private final int[] contadordedisparos = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    String secuencia = "";
+    private String secuencia = "";
 
     public Rdp() {
         //-1 significa que la transicion no esta sensibilizada por lo que el tiempo aun no corre.
@@ -117,7 +117,14 @@ public class Rdp {
             transiciontime[a] = -1;
             issensibilizada(a);
 
-            secuencia += a + " - ";
+            //sin hacer esto el programa de python para comprobar la expresion regular aveces (20% del tiempo) falla ya que se come una T0 y lo deja como 0 solo, entonces
+            //interpreta un invariante menos debido a ese error, haciendo que sea T00 se soluciona y funciona siempre
+            if(a<10){
+                secuencia += "T0" + a;
+            } 
+            else {
+                secuencia += "T" + a; 
+            }
 
             contadordedisparos[a]++;
         }
@@ -133,15 +140,17 @@ public class Rdp {
         }
     }
 
-    public void imprimircontador(){
-        //for(int i=0; i<17; i++){
-            System.out.print("contador del balanceo de la politica: ");
-            System.out.print(contadordedisparos[13]);
+    public void imprimircontador(){ //este valor siempre va a ser mayor al numero de invariantes deseados debido a que la red 
+        //se sigue disparando hasta que se paran todos los hilos.
+            System.out.print("Contador del balanceo de la politica: ");
+            System.out.print(contadordedisparos[11]);
             System.out.print(" , ");
-            System.out.print(contadordedisparos[14]);
-        //}
-        System.out.println();
-        System.out.println("secuencia: " + secuencia);
+            System.out.print(contadordedisparos[12]);
+            System.out.println();
+    }
+
+    public String contadorString(){
+        return ("Contador del balanceo de la politica: "+contadordedisparos[11]+" , "+contadordedisparos[12]);
     }
 
     private void testinvarianteplaza(){
@@ -169,6 +178,9 @@ public class Rdp {
             System.out.println("ERROR EN INVARIANTE DE TRANSICION, CERRANDO EJECUCION.");
             System.exit(0);
         }
-        
+    }
+
+    public String getSecuencia(){
+        return secuencia;
     }
 }

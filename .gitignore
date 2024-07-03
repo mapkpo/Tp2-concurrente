@@ -24,6 +24,12 @@ bin/
 
 ### VS Code ###
 .vscode/
+/Logs
+/out
+/out/
+/Secuencia
+/Secuencia/
+\Secuencia
 
 ### Mac OS ###
 .DS_Store

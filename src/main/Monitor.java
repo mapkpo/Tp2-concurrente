@@ -1,8 +1,6 @@
 package main;
 import java.util.concurrent.Semaphore;
 
-import java.util.Random;
-
 public class Monitor {
     final private Rdp petri;
     final private Semaphore mutex;
@@ -12,15 +10,14 @@ public class Monitor {
     final private Semaphore s_ajuste;
     final private Semaphore s_recorte;
     final private Semaphore s_exporta;
-    final private String politica;
+    final private Politica politica;
     final private Semaphore s_create;
+    
 
-
-    private int exportadas;
+    private boolean invariantescompletados = false; //bandera para parar hilos
     long starttime;
     long endtime;
-
-
+   
     Contenedor bufferentrada = new Contenedor();     //P0
     Contenedor bufferaprocesar = new Contenedor();  //P6
     Contenedor bufferajustadas = new Contenedor();   //P14
@@ -28,7 +25,7 @@ public class Monitor {
     Contenedor bufferexportadas = new Contenedor();   //OUTPUT
 
 
-    public Monitor(String _politica){
+    public Monitor(Politica _politica){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
         s_proc = new Semaphore(3);          //P3
@@ -38,7 +35,6 @@ public class Monitor {
         politica = _politica;
         s_create = new Semaphore(1); //creo que es redundante
 
-        exportadas = 0;
         starttime = System.currentTimeMillis();
     }
 
@@ -177,7 +173,7 @@ public class Monitor {
         mutex.release();
     }
 
-    /* T11|T122: Toma una imagen para ser recortada. */
+    /* T11|T12: Toma una imagen para ser recortada. */
     public Imagen startrecorte(){
         int T;
         while (true){
@@ -187,27 +183,10 @@ public class Monitor {
                 System.out.println("Monitor: interrupted while trying to acquire s_recorte: " + e);
             }
             getmutex();
-
-            Random rand = new Random();
-            double probabilidad = rand.nextDouble();
             
             if(petri.issensibilizada(11) && petri.issensibilizada(12)){
-                if(politica.equals("8020")){
-                    if (probabilidad < 0.8){
-                        T = 11;
-                        break;
-                    } else {
-                        T = 12;
-                        break;
-                    }
-                }
-                if(probabilidad < 0.5){
-                    T = 11;
-                    break;
-                } else {
-                    T = 12;
-                    break;
-                }
+                T = politica.numerodetransicion();
+                break;
             }
 
             s_recorte.release();
@@ -269,11 +248,46 @@ public class Monitor {
         endtime = System.currentTimeMillis();
         petri.disparar(16);
         bufferexportadas.agregar(img);
-        exportadas++;
-        System.out.println("se exportaron " + exportadas);
-        System.out.println("en " + (endtime - starttime) + " milisegundos");
-        petri.imprimircontador();
         s_exporta.release();
         mutex.release();
+    }
+
+    public boolean finalizarquestion(){
+        return invariantescompletados;
+    }
+
+    public void finalizar(){
+        invariantescompletados = true;
+        System.out.println("Programa finalizado con: " + getBufferExportadas() + " invariantes");
+        petri.imprimircontador();
+        //System.out.print(petri.getSecuencia());
+    }
+
+    public String getSecuencia(){
+        return petri.getSecuencia();
+    }
+
+    public int getBufferP0(){
+        return bufferentrada.getAgregadas();
+    }
+
+    public int getBufferP6(){
+        return bufferaprocesar.getAgregadas();
+    }
+
+    public int getBufferP14(){
+        return bufferajustadas.getAgregadas();
+    }
+
+    public int getBufferP18(){
+        return bufferlistas.getAgregadas();
+    }
+
+    public int getBufferExportadas(){
+        return bufferexportadas.getAgregadas();
+    }
+
+    public String getContadorBalanceo(){
+        return petri.contadorString();
     }
 }

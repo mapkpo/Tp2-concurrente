@@ -1,5 +1,7 @@
 package main;
 
+import java.util.concurrent.TimeUnit;
+
 public class Cargador implements Runnable{
     final Monitor monitor;
     String threadName;
@@ -11,13 +13,21 @@ public class Cargador implements Runnable{
     @Override
     public void run() {
         threadName = Thread.currentThread().getName();
+        System.out.printf("%s inicializado\n", threadName);
 
-        while (true){
+        while (!monitor.finalizarquestion()){
             //System.out.println(threadName + ": Buscando imagen para cargar.");
             Imagen img = monitor.startcarga();
 
             monitor.finishcarga(img);
             //System.out.println(threadName + ": Imagen cargada exitósamente.");
+
+
+             try{
+                TimeUnit.MILLISECONDS.sleep(0);
+            } catch(InterruptedException e){
+                e.printStackTrace();
+            }
         }
     }
 }
