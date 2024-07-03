@@ -1,6 +1,6 @@
 package main;
 
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
 
 public class Cargador implements Runnable{
     final Monitor monitor;
@@ -23,11 +23,11 @@ public class Cargador implements Runnable{
             //System.out.println(threadName + ": Imagen cargada exitósamente.");
 
 
-             try{
-                TimeUnit.MILLISECONDS.sleep(0);
+             /*try{
+                TimeUnit.MILLISECONDS.sleep(1);
             } catch(InterruptedException e){
                 e.printStackTrace();
-            }
+            }*/
         }
     }
 }

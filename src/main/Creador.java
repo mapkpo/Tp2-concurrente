@@ -1,6 +1,6 @@
 package main;
 
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
 
 public class Creador implements Runnable{
 
@@ -24,11 +24,11 @@ public class Creador implements Runnable{
             //System.out.println(threadName + ": Nueva imagen creada con éxito.");
             contador++;
 
-            try{
-                TimeUnit.MILLISECONDS.sleep(0);
+            /*try{
+                TimeUnit.MILLISECONDS.sleep(1);
             } catch(InterruptedException e){
                 e.printStackTrace();
-            }
+            }*/
         }
     }
 
