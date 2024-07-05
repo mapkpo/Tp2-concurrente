@@ -258,6 +258,11 @@ public class Monitor {
                 System.out.println("Monitor: interrupted while trying to acquire s_exporta: " + e);
             }
             getmutex();
+            if(invariantescompletados){
+                s_exporta.release();
+                mutex.release();
+                return null;
+            }
             if(petri.issensibilizada(15))
                 break;
             s_exporta.release();
@@ -290,8 +295,10 @@ public class Monitor {
 
     public void finalizar(){
         invariantescompletados = true;
+        getmutex();
         System.out.println("Programa finalizado con: " + getBufferExportadas() + " invariantes");
         petri.imprimircontador();
+        mutex.release();
         //System.out.print(petri.getSecuencia());
     }
 
