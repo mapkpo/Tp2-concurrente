@@ -216,6 +216,13 @@ public class Monitor {
             }
             getmutex();
             
+            // Verificacion de finalizacion
+            if(finalizarquestion()){
+                s_recorte.release();
+                mutex.release();
+                return null;
+            }
+
             if(petri.issensibilizada(11) && petri.issensibilizada(12)){
                 T = politica.numerodetransicion();
                 break;
@@ -229,6 +236,7 @@ public class Monitor {
         mutex.release();
         return to_cut;
     }
+    
 
     /* T13|T14: Carga las imagenes ya recortadas al buffer final. */
     public void finishrecorte(Imagen img){
