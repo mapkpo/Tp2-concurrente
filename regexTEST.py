@@ -19,30 +19,28 @@ invariant_patterns = [
     (r'T00.*?T02.*?T04.*?T06.*?T08.*?T10.*?T12.*?T14.*?T15.*?T16', 'T0-T2-T4-T6-T8-T10-T12-T14-T15-T16'),
     (r'T00.*?T02.*?T04.*?T06.*?T08.*?T10.*?T11.*?T13.*?T15.*?T16', 'T0-T2-T4-T6-T8-T10-T11-T13-T15-T16')
 ]
-
-total_count = 0
 invariant_counts = [0] * len(invariant_patterns)
 
-for i, (invariant_pattern, _) in enumerate(invariant_patterns):
-    invariant_counts[i] += len(re.findall(invariant_pattern, data))
+total_count = 0
 
 while True:
-    modified_data, count = re.subn(pattern, replacement, data)
-    total_count += count
-    if count == 0:
+    match = re.search(pattern, data)
+    if not match:
         break
-    data = modified_data
+
+    for i, (invariant_pattern, _) in enumerate(invariant_patterns):
+        invariant_counts[i] += len(re.findall(invariant_pattern, match[0]))
+
+    print("Patrón extraído: " + match[0])
+    data = re.sub(pattern, replacement, data, count=1)
+    total_count += 1
 
 t11_count = len(re.findall(r'T11', data))
 t12_count = len(re.findall(r'T12', data))
 
-print(f"{total_count} invariantes encontradas.")
-print("")
+
+print(str(total_count) + " invariantes encontradas.")
 print("Data sobrante: " + data)
 print(f"Las transiciones T11 y T12 se han disparado un extra de: {t11_count} , {t12_count} veces")
-print("")
-
 for i, (count, (_, pattern)) in enumerate(zip(invariant_counts, invariant_patterns)):
     print(f"Invariante de transición {pattern}: ha sucedido {count} veces")
-
-#k=input() 
