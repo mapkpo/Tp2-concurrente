@@ -43,7 +43,7 @@ public class Main {
         }
 
         for(int i = 0; i < numhilos2; i++){
-            creador[i] = new Creador(monitor);
+            creador[i] = new Creador(monitor, numerodeimagenesaprocesar);
             threadCreador[i] = new Thread(creador[i]);
             threadCreador[i].setName("Creador: " + i);
 
