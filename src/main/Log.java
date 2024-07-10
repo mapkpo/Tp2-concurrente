@@ -15,6 +15,7 @@ public class Log implements Runnable {
     Monitor monitor;
     File archivo;
     File archivo1;
+    final Long TIEMPO_INICIAL = System.currentTimeMillis();
     
     public Log(Thread[] threadCreador,Thread[] threadCargadores,Thread[] threadAjustadores,Thread[] threadRecortadores,Thread[] threadExportador, Monitor monitor){
         this.threadCreador = threadCreador;
@@ -27,9 +28,7 @@ public class Log implements Runnable {
 
         File directorio = new File("./Logs");
         if(!directorio.exists()){
-            if (directorio.mkdirs()) {
-            }
-            else {
+            if (!directorio.mkdirs()) {
                 System.out.println("Error al crear directorio");
             }
         }
@@ -47,11 +46,9 @@ public class Log implements Runnable {
 
         File directorio1 = new File("./Secuencia");
         if(!directorio1.exists()){
-            if (directorio1.mkdirs()) {
-            }
-            else {
+            if (!directorio1.mkdirs()) {
                 System.out.println("Error al crear directorio");
-            }
+            } //if it aint broken dont fix it
         }
         try {
             String nombreArchivo1 = ("Secuencia") + ".txt";
@@ -88,7 +85,8 @@ public class Log implements Runnable {
         try {
             FileWriter escribir = new FileWriter(archivo, true);
             try {
-                escribir.write("Iteración: " + contador + " tiempo: " + contador*500 + "ms\n");
+                Long tiempo_actual = System.currentTimeMillis();
+                escribir.write("Iteración: " + contador + " tiempo: " + (tiempo_actual - TIEMPO_INICIAL) + "ms\n"); //cambiarlo a tiempo del sistema
                 escribir.write("Imagenes creadas: " + monitor.getBufferP0() +"\n");
                 escribir.write("Imagenes cargadas: "+ monitor.getBufferP6() +"\n");
                 escribir.write("Imagenes ajustadas: "+ monitor.getBufferP14() +"\n");

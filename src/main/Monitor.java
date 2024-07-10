@@ -78,6 +78,13 @@ public class Monitor {
                 System.out.println("Monitor: interrupted while trying to acquire s_proc: " + e);
             }
             getmutex();
+
+            if(finalizarquestion()){
+                mutex.release();
+                s_proc.release();
+                return null;
+            }
+
             if(petri.issensibilizada(1))
                 break;
             else if(petri.issensibilizada(2)){
@@ -98,6 +105,10 @@ public class Monitor {
         int T = 3;
         while (true){
             getmutex();
+            if(finalizarquestion()){
+                mutex.release();
+                return;
+            }
             if(petri.issensibilizada(3))
                 break;
             if(petri.issensibilizada(4)){
@@ -122,6 +133,13 @@ public class Monitor {
                 System.out.println("Monitor: interrupted while trying to acquire s_ajuste: " + e);
             }
             getmutex();
+
+            if(finalizarquestion()){
+                mutex.release();
+                s_ajuste.release();
+                return null;
+            }
+
             if(petri.issensibilizada(5))
                 break;
             if(petri.issensibilizada(6)){
@@ -142,6 +160,13 @@ public class Monitor {
         int T = 7;
         while (true){
             getmutex();
+
+            if(finalizarquestion()){
+                mutex.release();
+                s_ajuste.release();
+                return;
+            }
+
             if(petri.issensibilizada(7))
                 break;
             if(petri.issensibilizada(8)){
@@ -159,6 +184,13 @@ public class Monitor {
         int T = 9;
         while (true){
             getmutex();
+
+            if(finalizarquestion()){
+                mutex.release();
+                s_ajuste.release();
+                return;
+            }
+
             if(petri.issensibilizada(9))
                 break;
             if(petri.issensibilizada(10)){
@@ -184,6 +216,13 @@ public class Monitor {
             }
             getmutex();
             
+            // Verificacion de finalizacion
+            if(finalizarquestion()){
+                s_recorte.release();
+                mutex.release();
+                return null;
+            }
+
             if(petri.issensibilizada(11) && petri.issensibilizada(12)){
                 T = politica.numerodetransicion();
                 break;
@@ -197,6 +236,7 @@ public class Monitor {
         mutex.release();
         return to_cut;
     }
+    
 
     /* T13|T14: Carga las imagenes ya recortadas al buffer final. */
     public void finishrecorte(Imagen img){
@@ -226,6 +266,11 @@ public class Monitor {
                 System.out.println("Monitor: interrupted while trying to acquire s_exporta: " + e);
             }
             getmutex();
+            if(invariantescompletados){
+                s_exporta.release();
+                mutex.release();
+                return null;
+            }
             if(petri.issensibilizada(15))
                 break;
             s_exporta.release();
@@ -258,8 +303,10 @@ public class Monitor {
 
     public void finalizar(){
         invariantescompletados = true;
+        getmutex();
         System.out.println("Programa finalizado con: " + getBufferExportadas() + " invariantes");
         petri.imprimircontador();
+        mutex.release();
         //System.out.print(petri.getSecuencia());
     }
 

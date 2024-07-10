@@ -1,16 +1,19 @@
 package main;
 
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Creador implements Runnable{
 
     final Monitor monitor;
     String threadName;
-    private int contador;
+    private static final AtomicInteger contador = new AtomicInteger(0);
+    private final int cantidadmaxima;
 
-    public Creador(Monitor monitor) {
+    public Creador(Monitor monitor, int cantidad) {
         this.monitor = monitor;
-        contador = 0;
+        cantidadmaxima = cantidad;
     }
 
     @Override
@@ -18,21 +21,15 @@ public class Creador implements Runnable{
         threadName = Thread.currentThread().getName();
         System.out.printf("%s inicializado\n", threadName);
 
-        while (!monitor.finalizarquestion()){
+        while (!monitor.finalizarquestion() && contador.get() < cantidadmaxima){
+            contador.incrementAndGet();
             //Espera a poder tomar control del mutex del monitor para agregar la imagen al contenedor P0.
             monitor.addimagen(new Imagen());
             //System.out.println(threadName + ": Nueva imagen creada con éxito.");
-            contador++;
-
-            try{
-                TimeUnit.MILLISECONDS.sleep(0);
-            } catch(InterruptedException e){
-                e.printStackTrace();
-            }
         }
     }
 
     public int getContador(){
-        return contador;
+        return contador.get();
     }
 }

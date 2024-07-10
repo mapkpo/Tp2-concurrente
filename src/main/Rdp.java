@@ -115,7 +115,7 @@ public class Rdp {
             actualizarmarcado(nuevomarcado);
 
             transiciontime[a] = -1;
-            issensibilizada(a);
+            //issensibilizada(a); al pedo
 
             //sin hacer esto el programa de python para comprobar la expresion regular aveces (20% del tiempo) falla ya que se come una T0 y lo deja como 0 solo, entonces
             //interpreta un invariante menos debido a ese error, haciendo que sea T00 se soluciona y funciona siempre

@@ -37,8 +37,8 @@ public class Contenedor {
 
     public Imagen getImagen() {
         if (!imagenes.isEmpty()) {
-            Imagen img = imagenes.get(imagenes.size() - 1);
-            imagenes.remove(img);
+            Imagen img = imagenes.remove(imagenes.size() - 1);
+            //imagenes.remove(img); al pedo
 
             return img;
         }

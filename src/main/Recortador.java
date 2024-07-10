@@ -1,6 +1,6 @@
 package main;
 
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
 
 public class Recortador implements Runnable{
     final Monitor monitor;
@@ -22,18 +22,16 @@ public class Recortador implements Runnable{
             //System.out.println(threadName + ": Buscando imagen para recortar.");
             Imagen img = monitor.startrecorte();
 
+            // Si no hay imagenes para recortar, terminar
+            if (img == null)
+                break;
+
             //System.out.println(threadName + ": Inciando recorte.");
 
             img.recortar();
             monitor.finishrecorte(img);
-           // System.out.println(threadName + ": Imagen recortada exitosamente.");
+            // System.out.println(threadName + ": Imagen recortada exitosamente.");
             contador++;
-
-             try{
-                TimeUnit.MILLISECONDS.sleep(0);
-            } catch(InterruptedException e){
-                e.printStackTrace();
-            }
         }
     }
 

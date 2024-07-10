@@ -4,9 +4,11 @@ public class Main {
     public static void main(String[] args) {
 
         final int setpolitica = 1;     //politica 1 es 50/50, 2 es 80/20
-        final int numerodeimagenesaprocesar = 30;  //numero de invariantes que buscamos
-        final int numhilos1 = 2;    //cargador, ajustador, recortador
-        final int numhilos2 = 1;    //creador, exportador
+        final int numerodeimagenesaprocesar = 15;  //numero de invariantes que buscamos
+        final int numhilos1 = 1000;    //cargador, ajustador, recortador
+        final int numhilos2 = 1000;    //creador, exportador
+
+        //agregar un check flag a exportador andtes de llamar a la bandera
 
         Politica politica = new Politica(setpolitica); 
         Monitor monitor = new Monitor(politica);
@@ -41,7 +43,7 @@ public class Main {
         }
 
         for(int i = 0; i < numhilos2; i++){
-            creador[i] = new Creador(monitor);
+            creador[i] = new Creador(monitor, numerodeimagenesaprocesar);
             threadCreador[i] = new Thread(creador[i]);
             threadCreador[i].setName("Creador: " + i);
 
