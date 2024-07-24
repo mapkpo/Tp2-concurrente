@@ -49,12 +49,12 @@ public class Monitor {
     public void addImage(Imagen img) {
         while(true){
             getMutex();
-            if(petri.issensibilizada(0))
+            if(petri.isEnabled(0))
                 break;
             mutex.release();
         }
 
-        petri.disparar(0);
+        petri.fire(0);
         bufferIn.agregar(img);
         semCreate.release();
         mutex.release();
@@ -77,16 +77,16 @@ public class Monitor {
                 return null;
             }
 
-            if(petri.issensibilizada(1))
+            if(petri.isEnabled(1))
                 break;
-            else if(petri.issensibilizada(2)){
+            else if(petri.isEnabled(2)){
                 T = 2;
                 break;
             }
             mutex.release();
             semProcess.release();
         }
-        petri.disparar(T);
+        petri.fire(T);
         Imagen toProcess = bufferIn.getImagen();
         mutex.release();
         return toProcess;
@@ -101,15 +101,15 @@ public class Monitor {
                 mutex.release();
                 return;
             }
-            if(petri.issensibilizada(3))
+            if(petri.isEnabled(3))
                 break;
-            if(petri.issensibilizada(4)){
+            if(petri.isEnabled(4)){
                 T = 4;
                 break;
             }
             mutex.release();
         }
-        petri.disparar(T);
+        petri.fire(T);
         bufferToProcess.agregar(img);
         mutex.release();
         semProcess.release();
@@ -132,16 +132,16 @@ public class Monitor {
                 return null;
             }
 
-            if(petri.issensibilizada(5))
+            if(petri.isEnabled(5))
                 break;
-            if(petri.issensibilizada(6)){
+            if(petri.isEnabled(6)){
                 T = 6;
                 break;
             }
             semAdjust.release();
             mutex.release();
         }
-        petri.disparar(T);
+        petri.fire(T);
         Imagen toAdjust = bufferToProcess.getImagen();
         mutex.release();
         return toAdjust;
@@ -159,15 +159,15 @@ public class Monitor {
                 return;
             }
 
-            if(petri.issensibilizada(7))
+            if(petri.isEnabled(7))
                 break;
-            if(petri.issensibilizada(8)){
+            if(petri.isEnabled(8)){
                 T = 8;
                 break;
             }
             mutex.release();
         }
-        petri.disparar(T);
+        petri.fire(T);
         mutex.release();
     }
 
@@ -183,15 +183,15 @@ public class Monitor {
                 return;
             }
 
-            if(petri.issensibilizada(9))
+            if(petri.isEnabled(9))
                 break;
-            if(petri.issensibilizada(10)){
+            if(petri.isEnabled(10)){
                 T = 10;
                 break;
             }
             mutex.release();
         }
-        petri.disparar(T);
+        petri.fire(T);
         bufferToAdjust.agregar(img);
         semAdjust.release();
         mutex.release();
@@ -215,7 +215,7 @@ public class Monitor {
                 return null;
             }
 
-            if(petri.issensibilizada(11) && petri.issensibilizada(12)){
+            if(petri.isEnabled(11) && petri.isEnabled(12)){
                 T = politic.numerodetransicion();
                 break;
             }
@@ -223,7 +223,7 @@ public class Monitor {
             semCut.release();
             mutex.release();
         }
-        petri.disparar(T);
+        petri.fire(T);
         Imagen toCut = bufferToAdjust.getImagen();
         mutex.release();
         return toCut;
@@ -235,15 +235,15 @@ public class Monitor {
         int T = 13;
         while (true){
             getMutex();
-            if(petri.issensibilizada(13))
+            if(petri.isEnabled(13))
                 break;
-            if(petri.issensibilizada(14)){
+            if(petri.isEnabled(14)){
                 T = 14;
                 break;
             }
             mutex.release();
         }
-        petri.disparar(T);
+        petri.fire(T);
         bufferReady.agregar(img);
         semCut.release();
         mutex.release();
@@ -263,12 +263,12 @@ public class Monitor {
                 mutex.release();
                 return null;
             }
-            if(petri.issensibilizada(15))
+            if(petri.isEnabled(15))
                 break;
             semExport.release();
             mutex.release();
         }
-        petri.disparar(15);
+        petri.fire(15);
         Imagen toExport = bufferReady.getImagen();
         mutex.release();
         return toExport;
@@ -278,12 +278,12 @@ public class Monitor {
     public void finishExport(Imagen img){
         while (true){
             getMutex();
-            if(petri.issensibilizada(16))
+            if(petri.isEnabled(16))
                 break;
             mutex.release();
         }
         endTime = System.currentTimeMillis();
-        petri.disparar(16);
+        petri.fire(16);
         bufferExported.agregar(img);
         semExport.release();
         mutex.release();
@@ -297,13 +297,13 @@ public class Monitor {
         allInvariatesCompleted = true;
         getMutex();
         System.out.println("Programa finalizado con: " + getBufferExported() + " invariantes");
-        petri.imprimircontador();
+        petri.printCounter();
         mutex.release();
         //System.out.print(petri.getSecuencia());
     }
 
     public String getSecuence(){
-        return petri.getSecuencia();
+        return petri.getSequence();
     }
 
     public int getBufferP0(){
@@ -327,6 +327,6 @@ public class Monitor {
     }
 
     public String getBalanceCount(){
-        return petri.contadorString();
+        return petri.counterString();
     }
 }
