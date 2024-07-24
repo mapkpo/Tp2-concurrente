@@ -6,55 +6,55 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Log implements Runnable {
-    int contador;
-    Thread[] threadCreador;
-    Thread[] threadCargadores;
-    Thread[] threadAjustadores;
-    Thread[] threadRecortadores;
-    Thread[] threadExportador;
+    int count;
+    Thread[] threadCreator;
+    Thread[] threadLoader;
+    Thread[] threadAdjusters;
+    Thread[] threadTrimmers;
+    Thread[] threadExporters;
     Monitor monitor;
-    File archivo;
-    File archivo1;
-    final Long TIEMPO_INICIAL = System.currentTimeMillis();
+    File file;
+    File file1;
+    final Long INITIAL_TIME = System.currentTimeMillis();
     
-    public Log(Thread[] threadCreador,Thread[] threadCargadores,Thread[] threadAjustadores,Thread[] threadRecortadores,Thread[] threadExportador, Monitor monitor){
-        this.threadCreador = threadCreador;
-        this.threadCargadores = threadCargadores;
-        this.threadAjustadores = threadAjustadores;
-        this.threadRecortadores = threadRecortadores;
-        this.threadExportador = threadExportador;
+    public Log(Thread[] threadCreator, Thread[] threadLoader, Thread[] threadAdjusters, Thread[] threadTrimmers, Thread[] threadExporters, Monitor monitor){
+        this.threadCreator = threadCreator;
+        this.threadLoader = threadLoader;
+        this.threadAdjusters = threadAdjusters;
+        this.threadTrimmers = threadTrimmers;
+        this.threadExporters = threadExporters;
         this.monitor = monitor;
-        contador = 0;
+        count = 0;
 
-        File directorio = new File("./Logs");
-        if(!directorio.exists()){
-            if (!directorio.mkdirs()) {
+        File directory = new File("./Logs");
+        if(!directory.exists()){
+            if (!directory.mkdirs()) {
                 System.out.println("Error al crear directorio");
             }
         }
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-            String nombreArchivo = "log-" + dateFormat.format(new Date()) + ".txt";
-            archivo = new File(directorio, nombreArchivo);
-            if (!archivo.exists()) {
-                archivo.createNewFile();
+            String fileName = "log-" + dateFormat.format(new Date()) + ".txt";
+            file = new File(directory, fileName);
+            if (!file.exists()) {
+                file.createNewFile();
             }
         }
         catch (IOException e) {
             System.out.println("Problema al crear el archivo de LOG.");
         }
 
-        File directorio1 = new File("./Secuencia");
-        if(!directorio1.exists()){
-            if (!directorio1.mkdirs()) {
+        File directory1 = new File("./Secuencia");
+        if(!directory1.exists()){
+            if (!directory1.mkdirs()) {
                 System.out.println("Error al crear directorio");
             } //if it aint broken dont fix it
         }
         try {
-            String nombreArchivo1 = ("Secuencia") + ".txt";
-            archivo1 = new File(directorio1, nombreArchivo1);
-            if (!archivo1.exists()) {
-                archivo1.createNewFile();
+            String fileName1 = ("Secuencia") + ".txt";
+            file1 = new File(directory1, fileName1);
+            if (!file1.exists()) {
+                file1.createNewFile();
             }
         }
         catch (IOException e) {
@@ -66,92 +66,92 @@ public class Log implements Runnable {
     public void run() {
         while (!monitor.isReadyToFinish()){
             try {
-                escribir_archivo();
-                this.contador++;
+                writeFile();
+                this.count++;
                 Thread.sleep(500);
             }
             catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        this.contador++;
-        escribir_archivo();
-        escribir_secuencialog();
-        escribir_secuenciasola();
+        this.count++;
+        writeFile();
+        logWriteSequence();
+        writeSequenceOnly();
     }
 
 
-    private void escribir_archivo(){
+    private void writeFile(){
         try {
-            FileWriter escribir = new FileWriter(archivo, true);
+            FileWriter writer = new FileWriter(file, true);
             try {
-                Long tiempo_actual = System.currentTimeMillis();
-                escribir.write("Iteración: " + contador + " tiempo: " + (tiempo_actual - TIEMPO_INICIAL) + "ms\n"); //cambiarlo a tiempo del sistema
-                escribir.write("Imagenes creadas: " + monitor.getBufferP0() +"\n");
-                escribir.write("Imagenes cargadas: "+ monitor.getBufferP6() +"\n");
-                escribir.write("Imagenes ajustadas: "+ monitor.getBufferP14() +"\n");
-                escribir.write("Imagenes recortadas: "+ monitor.getBufferP18() +"\n");
-                escribir.write("Imagenes exportadas: "+ monitor.getBufferExported() +"\n");
-                escribir.write(monitor.getBalanceCount() +"\n");
+                Long currentTime = System.currentTimeMillis();
+                writer.write("Iteración: " + count + " tiempo: " + (currentTime - INITIAL_TIME) + "ms\n");
+                writer.write("Imagenes creadas: " + monitor.getBufferP0() +"\n");
+                writer.write("Imagenes cargadas: "+ monitor.getBufferP6() +"\n");
+                writer.write("Imagenes ajustadas: "+ monitor.getBufferP14() +"\n");
+                writer.write("Imagenes recortadas: "+ monitor.getBufferP18() +"\n");
+                writer.write("Imagenes exportadas: "+ monitor.getBufferExported() +"\n");
+                writer.write(monitor.getBalanceCount() +"\n");
 
-                for (Thread thread:threadCreador){
-                    escribir.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
+                for (Thread thread: threadCreator){
+                    writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
-                for (Thread thread:threadCargadores){
-                    escribir.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
+                for (Thread thread: threadLoader){
+                    writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
-                for (Thread thread:threadAjustadores){
-                    escribir.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
+                for (Thread thread: threadAdjusters){
+                    writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
-                for (Thread thread:threadRecortadores){
-                    escribir.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
+                for (Thread thread: threadTrimmers){
+                    writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
-                for (Thread thread:threadExportador){
-                    escribir.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
+                for (Thread thread: threadExporters){
+                    writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
-                escribir.write("\n\n");
+                writer.write("\n\n");
             }
             catch (IOException e){
                 System.out.println("Problema al escribir en el archivo de LOG.");
             }
             finally {
-                escribir.close();
+                writer.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void escribir_secuencialog(){
+    private void logWriteSequence(){
         try {
-            FileWriter escribir = new FileWriter(archivo, true);
+            FileWriter writer = new FileWriter(file, true);
             try {
-                escribir.write("Secuencia: "+ monitor.getSecuence() +"\n");
+                writer.write("Secuencia: "+ monitor.getSecuence() +"\n");
                 
-                escribir.write("\n\n");
+                writer.write("\n\n");
             }
             catch (IOException e){
                 System.out.println("Problema al escribir en el archivo de LOG.");
             }
             finally {
-                escribir.close();
+                writer.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void escribir_secuenciasola(){
+    private void writeSequenceOnly(){
         try {
-            FileWriter escribir = new FileWriter(archivo1, false);
+            FileWriter writer = new FileWriter(file1, false);
             try {
-                escribir.write(monitor.getSecuence()+"\n");
+                writer.write(monitor.getSecuence()+"\n");
                 }
             catch (IOException e){
                 System.out.println("Problema al escribir en el archivo de LOG.");
             }
             finally {
-                escribir.close();
+                writer.close();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
