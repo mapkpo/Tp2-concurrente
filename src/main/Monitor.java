@@ -8,7 +8,7 @@ public class Monitor {
     final private Semaphore semAdjust;
     final private Semaphore semCut;
     final private Semaphore semExport;
-    final private Politica politic;
+    final private Politic politic;
     final private Semaphore semCreate;
     
 
@@ -23,7 +23,7 @@ public class Monitor {
     Contenedor bufferExported = new Contenedor();   //OUTPUT
 
 
-    public Monitor(Politica _politic){
+    public Monitor(Politic _politic){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
         semProcess = new Semaphore(3);          //P3
@@ -216,7 +216,7 @@ public class Monitor {
             }
 
             if(petri.isEnabled(11) && petri.isEnabled(12)){
-                T = politic.numerodetransicion();
+                T = politic.transitionNumber();
                 break;
             }
 

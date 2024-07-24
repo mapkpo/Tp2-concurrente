@@ -10,8 +10,8 @@ public class Main {
 
         //agregar un check flag a exportador andtes de llamar a la bandera
 
-        Politica politica = new Politica(setpolitica); 
-        Monitor monitor = new Monitor(politica);
+        Politic politic = new Politic(setpolitica);
+        Monitor monitor = new Monitor(politic);
 
         Creador[] creador = new Creador[numhilos2];
         Thread[] threadCreador = new Thread[numhilos2];
