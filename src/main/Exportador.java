@@ -20,15 +20,15 @@ public class Exportador implements Runnable{
         threadName = Thread.currentThread().getName();
         System.out.printf("%s inicializado\n", threadName);
 
-        while (contador.get() < max && !monitor.finalizarquestion()){
+        while (contador.get() < max && !monitor.isReadyToFinish()){
             //System.out.println(threadName + ": Buscando imagen para exportar.");
-            Imagen img = monitor.startexporte();
+            Imagen img = monitor.startExport();
 
-            if(monitor.finalizarquestion()){
+            if(monitor.isReadyToFinish()){
                 break;
             }
 
-            monitor.finishexport(img);
+            monitor.finishExport(img);
             //System.out.println(threadName + ": Imagen exportada exitósamente.");
             contador.incrementAndGet();
 
@@ -38,7 +38,7 @@ public class Exportador implements Runnable{
                 e.printStackTrace();
             }*/
         }
-        monitor.finalizar();
+        monitor.finish();
     }
 
     public int getContador(){

@@ -15,15 +15,15 @@ public class Ajustador implements Runnable{
         threadName = Thread.currentThread().getName();
         System.out.printf("%s inicializado\n", threadName);
 
-        while (!monitor.finalizarquestion()){
+        while (!monitor.isReadyToFinish()){
             //System.out.println(threadName + ": Buscando imagen para ajustar.");
-            Imagen img = monitor.startajuste();
+            Imagen img = monitor.startAdjust();
 
-            monitor.midajuste();
+            monitor.midAdjust();
             //System.out.println(threadName + ": Ajuste inicial finalizado exitosamente.");
             //System.out.println(threadName + ": Iniciando ajuste final.");
 
-            monitor.finishajuste(img);
+            monitor.finishAdjust(img);
             //System.out.println(threadName + ": Ajuste final finalizado exitosamente.");
             contador++;
         }

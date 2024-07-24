@@ -21,10 +21,10 @@ public class Creador implements Runnable{
         threadName = Thread.currentThread().getName();
         System.out.printf("%s inicializado\n", threadName);
 
-        while (!monitor.finalizarquestion() && contador.get() < cantidadmaxima){
+        while (!monitor.isReadyToFinish() && contador.get() < cantidadmaxima){
             contador.incrementAndGet();
             //Espera a poder tomar control del mutex del monitor para agregar la imagen al contenedor P0.
-            monitor.addimagen(new Imagen());
+            monitor.addImage(new Imagen());
             //System.out.println(threadName + ": Nueva imagen creada con éxito.");
         }
     }

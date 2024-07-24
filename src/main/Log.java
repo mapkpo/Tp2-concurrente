@@ -64,7 +64,7 @@ public class Log implements Runnable {
 
     @Override
     public void run() {
-        while (!monitor.finalizarquestion()){
+        while (!monitor.isReadyToFinish()){
             try {
                 escribir_archivo();
                 this.contador++;
@@ -91,8 +91,8 @@ public class Log implements Runnable {
                 escribir.write("Imagenes cargadas: "+ monitor.getBufferP6() +"\n");
                 escribir.write("Imagenes ajustadas: "+ monitor.getBufferP14() +"\n");
                 escribir.write("Imagenes recortadas: "+ monitor.getBufferP18() +"\n");
-                escribir.write("Imagenes exportadas: "+ monitor.getBufferExportadas() +"\n");
-                escribir.write(monitor.getContadorBalanceo() +"\n");
+                escribir.write("Imagenes exportadas: "+ monitor.getBufferExported() +"\n");
+                escribir.write(monitor.getBalanceCount() +"\n");
 
                 for (Thread thread:threadCreador){
                     escribir.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
@@ -126,7 +126,7 @@ public class Log implements Runnable {
         try {
             FileWriter escribir = new FileWriter(archivo, true);
             try {
-                escribir.write("Secuencia: "+ monitor.getSecuencia() +"\n");
+                escribir.write("Secuencia: "+ monitor.getSecuence() +"\n");
                 
                 escribir.write("\n\n");
             }
@@ -145,7 +145,7 @@ public class Log implements Runnable {
         try {
             FileWriter escribir = new FileWriter(archivo1, false);
             try {
-                escribir.write(monitor.getSecuencia()+"\n");
+                escribir.write(monitor.getSecuence()+"\n");
                 }
             catch (IOException e){
                 System.out.println("Problema al escribir en el archivo de LOG.");
