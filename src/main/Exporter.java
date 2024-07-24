@@ -3,14 +3,14 @@ package main;
 // import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Exportador implements Runnable{
+public class Exporter implements Runnable{
     
     final Monitor monitor;
     String threadName;
-    private static final AtomicInteger contador = new AtomicInteger(0);
+    private static final AtomicInteger counter = new AtomicInteger(0);
     private final int max;
 
-    public Exportador(Monitor monitor, int cantidad) {
+    public Exporter(Monitor monitor, int cantidad) {
         this.monitor = monitor;
         max = cantidad;
     }
@@ -20,7 +20,7 @@ public class Exportador implements Runnable{
         threadName = Thread.currentThread().getName();
         System.out.printf("%s inicializado\n", threadName);
 
-        while (contador.get() < max && !monitor.isReadyToFinish()){
+        while (counter.get() < max && !monitor.isReadyToFinish()){
             //System.out.println(threadName + ": Buscando imagen para exportar.");
             Image img = monitor.startExport();
 
@@ -30,18 +30,12 @@ public class Exportador implements Runnable{
 
             monitor.finishExport(img);
             //System.out.println(threadName + ": Imagen exportada exitósamente.");
-            contador.incrementAndGet();
-
-            /*try{
-                TimeUnit.MILLISECONDS.sleep(0);
-            } catch(InterruptedException e){
-                e.printStackTrace();
-            }*/
+            counter.incrementAndGet();
         }
         monitor.finish();
     }
 
     public int getContador(){
-        return contador.get();
+        return counter.get();
     }
 }

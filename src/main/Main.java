@@ -13,42 +13,42 @@ public class Main {
         Politic politic = new Politic(setpolitica);
         Monitor monitor = new Monitor(politic);
 
-        Creador[] creador = new Creador[numhilos2];
+        Creator[] creator = new Creator[numhilos2];
         Thread[] threadCreador = new Thread[numhilos2];
 
-        Cargador[] cargadores = new Cargador[numhilos1];
+        Loader[] cargadores = new Loader[numhilos1];
         Thread[] threadCargadores = new Thread[numhilos1];
 
-        Ajustador[] ajustadores = new Ajustador[numhilos1];
+        Adjuster[] ajustadores = new Adjuster[numhilos1];
         Thread[] threadAjustadores = new Thread[numhilos1];
 
-        Recortador[] recortadores = new Recortador[numhilos1];
+        Trimmer[] recortadores = new Trimmer[numhilos1];
         Thread[] threadRecortadores = new Thread[numhilos1];
 
-        Exportador[] exportador = new Exportador[numhilos2];
+        Exporter[] exporter = new Exporter[numhilos2];
         Thread[] threadExportador = new Thread[numhilos2];
 
         for(int i = 0; i < numhilos1; i++){
-            cargadores[i] = new Cargador(monitor);
+            cargadores[i] = new Loader(monitor);
             threadCargadores[i] = new Thread(cargadores[i]);
             threadCargadores[i].setName("Cargador: " + i);
 
-            ajustadores[i] = new Ajustador(monitor);
+            ajustadores[i] = new Adjuster(monitor);
             threadAjustadores[i] = new Thread(ajustadores[i]);
             threadAjustadores[i].setName("Ajustador: " + i);
 
-            recortadores[i] = new Recortador(monitor);
+            recortadores[i] = new Trimmer(monitor);
             threadRecortadores[i] = new Thread(recortadores[i]);
             threadRecortadores[i].setName("Recortador: " + i);
         }
 
         for(int i = 0; i < numhilos2; i++){
-            creador[i] = new Creador(monitor, numerodeimagenesaprocesar);
-            threadCreador[i] = new Thread(creador[i]);
+            creator[i] = new Creator(monitor, numerodeimagenesaprocesar);
+            threadCreador[i] = new Thread(creator[i]);
             threadCreador[i].setName("Creador: " + i);
 
-            exportador[i] = new Exportador(monitor, numerodeimagenesaprocesar);
-            threadExportador[i] = new Thread(exportador[i]);
+            exporter[i] = new Exporter(monitor, numerodeimagenesaprocesar);
+            threadExportador[i] = new Thread(exporter[i]);
             threadExportador[i].setName("Exportador: " + i);
         }
 

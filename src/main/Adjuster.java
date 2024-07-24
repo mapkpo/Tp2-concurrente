@@ -1,13 +1,13 @@
 package main;
 
-public class Ajustador implements Runnable{
+public class Adjuster implements Runnable{
     final Monitor monitor;
     String threadName;
-    private int contador;
+    private int counter;
 
-    public Ajustador(Monitor monitor) {
+    public Adjuster(Monitor monitor) {
         this.monitor = monitor;
-        contador = 0;
+        counter = 0;
     }
 
     @Override
@@ -25,11 +25,11 @@ public class Ajustador implements Runnable{
 
             monitor.finishAdjust(img);
             //System.out.println(threadName + ": Ajuste final finalizado exitosamente.");
-            contador++;
+            counter++;
         }
     }
 
-    public int getContador(){
-        return contador;
+    public int getCounter(){
+        return counter;
     }
 }

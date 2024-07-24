@@ -2,14 +2,14 @@ package main;
 
 //import java.util.concurrent.TimeUnit;
 
-public class Recortador implements Runnable{
+public class Trimmer implements Runnable{
     final Monitor monitor;
     String threadName;
-    private int contador;
+    private int counter;
 
-    public Recortador(Monitor monitor) {
+    public Trimmer(Monitor monitor) {
         this.monitor = monitor;
-        contador = 0;
+        counter = 0;
     }
 
     @Override
@@ -31,11 +31,11 @@ public class Recortador implements Runnable{
             img.trim();
             monitor.finishCut(img);
             // System.out.println(threadName + ": Imagen recortada exitosamente.");
-            contador++;
+            counter++;
         }
     }
 
-    public int getContador(){
-        return contador;
+    public int getCounter(){
+        return counter;
     }
 }
