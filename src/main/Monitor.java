@@ -16,11 +16,11 @@ public class Monitor {
     long startTime;
     long endTime;
    
-    Contenedor bufferIn = new Contenedor();     //P0
-    Contenedor bufferToProcess = new Contenedor();  //P6
-    Contenedor bufferToAdjust = new Contenedor();   //P14
-    Contenedor bufferReady = new Contenedor();   //P18
-    Contenedor bufferExported = new Contenedor();   //OUTPUT
+    Container bufferIn = new Container();     //P0
+    Container bufferToProcess = new Container();  //P6
+    Container bufferToAdjust = new Container();   //P14
+    Container bufferReady = new Container();   //P18
+    Container bufferExported = new Container();   //OUTPUT
 
 
     public Monitor(Politic _politic){
@@ -55,7 +55,7 @@ public class Monitor {
         }
 
         petri.fire(0);
-        bufferIn.agregar(img);
+        bufferIn.add(img);
         semCreate.release();
         mutex.release();
     }
@@ -87,7 +87,7 @@ public class Monitor {
             semProcess.release();
         }
         petri.fire(T);
-        Image toProcess = bufferIn.getImagen();
+        Image toProcess = bufferIn.getImage();
         mutex.release();
         return toProcess;
     }
@@ -110,7 +110,7 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(T);
-        bufferToProcess.agregar(img);
+        bufferToProcess.add(img);
         mutex.release();
         semProcess.release();
     }
@@ -142,7 +142,7 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(T);
-        Image toAdjust = bufferToProcess.getImagen();
+        Image toAdjust = bufferToProcess.getImage();
         mutex.release();
         return toAdjust;
     }
@@ -192,7 +192,7 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(T);
-        bufferToAdjust.agregar(img);
+        bufferToAdjust.add(img);
         semAdjust.release();
         mutex.release();
     }
@@ -224,7 +224,7 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(T);
-        Image toCut = bufferToAdjust.getImagen();
+        Image toCut = bufferToAdjust.getImage();
         mutex.release();
         return toCut;
     }
@@ -244,7 +244,7 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(T);
-        bufferReady.agregar(img);
+        bufferReady.add(img);
         semCut.release();
         mutex.release();
     }
@@ -269,7 +269,7 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(15);
-        Image toExport = bufferReady.getImagen();
+        Image toExport = bufferReady.getImage();
         mutex.release();
         return toExport;
     }
@@ -284,7 +284,7 @@ public class Monitor {
         }
         endTime = System.currentTimeMillis();
         petri.fire(16);
-        bufferExported.agregar(img);
+        bufferExported.add(img);
         semExport.release();
         mutex.release();
     }
@@ -307,23 +307,23 @@ public class Monitor {
     }
 
     public int getBufferP0(){
-        return bufferIn.getAgregadas();
+        return bufferIn.getAdded();
     }
 
     public int getBufferP6(){
-        return bufferToProcess.getAgregadas();
+        return bufferToProcess.getAdded();
     }
 
     public int getBufferP14(){
-        return bufferToAdjust.getAgregadas();
+        return bufferToAdjust.getAdded();
     }
 
     public int getBufferP18(){
-        return bufferReady.getAgregadas();
+        return bufferReady.getAdded();
     }
 
     public int getBufferExported(){
-        return bufferExported.getAgregadas();
+        return bufferExported.getAdded();
     }
 
     public String getBalanceCount(){
