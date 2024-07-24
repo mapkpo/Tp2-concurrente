@@ -24,7 +24,7 @@ public class Creador implements Runnable{
         while (!monitor.isReadyToFinish() && contador.get() < cantidadmaxima){
             contador.incrementAndGet();
             //Espera a poder tomar control del mutex del monitor para agregar la imagen al contenedor P0.
-            monitor.addImage(new Imagen());
+            monitor.addImage(new Image());
             //System.out.println(threadName + ": Nueva imagen creada con éxito.");
         }
     }

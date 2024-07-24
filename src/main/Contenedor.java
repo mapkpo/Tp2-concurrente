@@ -2,7 +2,7 @@ package main;
 
 import java.util.ArrayList;
 public class Contenedor {
-    private final ArrayList<Imagen> imagenes;
+    private final ArrayList<Image> imagenes;
     private int agregadas;
     //private final int totales;
 
@@ -22,8 +22,8 @@ public class Contenedor {
             System.out.println("Ya se ha alcanzado el límite");
         }
     }*/
-    void agregar(Imagen imagen){
-        this.imagenes.add(imagen);
+    void agregar(Image image){
+        this.imagenes.add(image);
         agregarContador();
     }
 
@@ -35,9 +35,9 @@ public class Contenedor {
         return agregadas;
     }
 
-    public Imagen getImagen() {
+    public Image getImagen() {
         if (!imagenes.isEmpty()) {
-            Imagen img = imagenes.remove(imagenes.size() - 1);
+            Image img = imagenes.remove(imagenes.size() - 1);
             //imagenes.remove(img); al pedo
 
             return img;
@@ -45,7 +45,7 @@ public class Contenedor {
         return null;
     }
 
-    public void removerImagen(Imagen img){
+    public void removerImagen(Image img){
         imagenes.remove(img);
     }
 

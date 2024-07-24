@@ -17,7 +17,7 @@ public class Ajustador implements Runnable{
 
         while (!monitor.isReadyToFinish()){
             //System.out.println(threadName + ": Buscando imagen para ajustar.");
-            Imagen img = monitor.startAdjust();
+            Image img = monitor.startAdjust();
 
             monitor.midAdjust();
             //System.out.println(threadName + ": Ajuste inicial finalizado exitosamente.");

@@ -22,7 +22,7 @@ public class Exportador implements Runnable{
 
         while (contador.get() < max && !monitor.isReadyToFinish()){
             //System.out.println(threadName + ": Buscando imagen para exportar.");
-            Imagen img = monitor.startExport();
+            Image img = monitor.startExport();
 
             if(monitor.isReadyToFinish()){
                 break;

@@ -46,7 +46,7 @@ public class Monitor {
     }
 
     /* T0: Agrega una imagen al buffer de entrada. */
-    public void addImage(Imagen img) {
+    public void addImage(Image img) {
         while(true){
             getMutex();
             if(petri.isEnabled(0))
@@ -61,7 +61,7 @@ public class Monitor {
     }
 
     /* T1|T2: Toma una imagen del buffer de entrada. */
-    public Imagen startLoading() {
+    public Image startLoading() {
         int T = 1;
         while(true){
             try{
@@ -87,13 +87,13 @@ public class Monitor {
             semProcess.release();
         }
         petri.fire(T);
-        Imagen toProcess = bufferIn.getImagen();
+        Image toProcess = bufferIn.getImagen();
         mutex.release();
         return toProcess;
     }
 
     /* T3|T4: Carga la imagen al buffer de imagenes a procesar. */
-    public void finishLoading(Imagen img){
+    public void finishLoading(Image img){
         int T = 3;
         while (true){
             getMutex();
@@ -116,7 +116,7 @@ public class Monitor {
     }
 
     /* T5|T6: Toma una imagen del buffer a procesar. */
-    public Imagen startAdjust(){
+    public Image startAdjust(){
         int T = 5;
         while (true){
             try{
@@ -142,7 +142,7 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(T);
-        Imagen toAdjust = bufferToProcess.getImagen();
+        Image toAdjust = bufferToProcess.getImagen();
         mutex.release();
         return toAdjust;
     }
@@ -172,7 +172,7 @@ public class Monitor {
     }
 
     /* T9|T10: Agrega una imagen ya ajustada al bufffer de ajustadas. */
-    public void finishAdjust(Imagen img){
+    public void finishAdjust(Image img){
         int T = 9;
         while (true){
             getMutex();
@@ -198,7 +198,7 @@ public class Monitor {
     }
 
     /* T11|T12: Toma una imagen para ser recortada. */
-    public Imagen startCut(){
+    public Image startCut(){
         int T;
         while (true){
             try{
@@ -224,14 +224,14 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(T);
-        Imagen toCut = bufferToAdjust.getImagen();
+        Image toCut = bufferToAdjust.getImagen();
         mutex.release();
         return toCut;
     }
     
 
     /* T13|T14: Carga las imagenes ya recortadas al buffer final. */
-    public void finishCut(Imagen img){
+    public void finishCut(Image img){
         int T = 13;
         while (true){
             getMutex();
@@ -250,7 +250,7 @@ public class Monitor {
     }
 
     /* T15: Toma una imagen para exportarla. */
-    public Imagen startExport(){
+    public Image startExport(){
         while (true){
             try{
                 semExport.acquire();
@@ -269,13 +269,13 @@ public class Monitor {
             mutex.release();
         }
         petri.fire(15);
-        Imagen toExport = bufferReady.getImagen();
+        Image toExport = bufferReady.getImagen();
         mutex.release();
         return toExport;
     }
 
     /* T16: Carga la imagen en el buffer de exportadas. */
-    public void finishExport(Imagen img){
+    public void finishExport(Image img){
         while (true){
             getMutex();
             if(petri.isEnabled(16))

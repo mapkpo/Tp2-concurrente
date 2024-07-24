@@ -20,7 +20,7 @@ public class Recortador implements Runnable{
 
         while (!monitor.isReadyToFinish()){
             //System.out.println(threadName + ": Buscando imagen para recortar.");
-            Imagen img = monitor.startCut();
+            Image img = monitor.startCut();
 
             // Si no hay imagenes para recortar, terminar
             if (img == null)
@@ -28,7 +28,7 @@ public class Recortador implements Runnable{
 
             //System.out.println(threadName + ": Inciando recorte.");
 
-            img.recortar();
+            img.trim();
             monitor.finishCut(img);
             // System.out.println(threadName + ": Imagen recortada exitosamente.");
             contador++;

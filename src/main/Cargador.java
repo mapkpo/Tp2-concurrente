@@ -17,7 +17,7 @@ public class Cargador implements Runnable{
 
         while (!monitor.isReadyToFinish()){
             //System.out.println(threadName + ": Buscando imagen para cargar.");
-            Imagen img = monitor.startLoading();
+            Image img = monitor.startLoading();
 
             monitor.finishLoading(img);
             //System.out.println(threadName + ": Imagen cargada exitósamente.");
