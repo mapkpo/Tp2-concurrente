@@ -6,13 +6,13 @@ public class Monitor {
     final private Semaphore mutex;
     final private Semaphore semProcess;
     final private Semaphore semAdjust;
-    final private Semaphore semCut;
+    final private Semaphore semTrim;
     final private Semaphore semExport;
     final private Politic politic;
     final private Semaphore semCreate;
     
 
-    private boolean allInvariatesCompleted = false; //bandera para parar hilos
+    private boolean allInvariantsCompleted = false; //bandera para parar hilos
     long startTime;
     long endTime;
    
@@ -28,7 +28,7 @@ public class Monitor {
         mutex = new Semaphore(1, true);
         semProcess = new Semaphore(3);          //P3
         semAdjust = new Semaphore(2);        //P9
-        semCut = new Semaphore(1);       //P15
+        semTrim = new Semaphore(1);       //P15
         semExport = new Semaphore(1);       //P20
         politic = _politic;
         semCreate = new Semaphore(1); //creo que es redundante
@@ -198,11 +198,11 @@ public class Monitor {
     }
 
     /* T11|T12: Toma una imagen para ser recortada. */
-    public Image startCut(){
+    public Image startTrimming(){
         int T;
         while (true){
             try{
-                semCut.acquire();
+                semTrim.acquire();
             } catch (InterruptedException e){
                 System.out.println("Monitor: interrupted while trying to acquire s_recorte: " + e);
             }
@@ -210,7 +210,7 @@ public class Monitor {
             
             // Verificacion de finalizacion
             if(isReadyToFinish()){
-                semCut.release();
+                semTrim.release();
                 mutex.release();
                 return null;
             }
@@ -220,18 +220,18 @@ public class Monitor {
                 break;
             }
 
-            semCut.release();
+            semTrim.release();
             mutex.release();
         }
         petri.fire(T);
-        Image toCut = bufferToAdjust.getImage();
+        Image toTrim = bufferToAdjust.getImage();
         mutex.release();
-        return toCut;
+        return toTrim;
     }
     
 
     /* T13|T14: Carga las imagenes ya recortadas al buffer final. */
-    public void finishCut(Image img){
+    public void finishTrim(Image img){
         int T = 13;
         while (true){
             getMutex();
@@ -245,7 +245,7 @@ public class Monitor {
         }
         petri.fire(T);
         bufferReady.add(img);
-        semCut.release();
+        semTrim.release();
         mutex.release();
     }
 
@@ -258,7 +258,7 @@ public class Monitor {
                 System.out.println("Monitor: interrupted while trying to acquire s_exporta: " + e);
             }
             getMutex();
-            if(allInvariatesCompleted){
+            if(allInvariantsCompleted){
                 semExport.release();
                 mutex.release();
                 return null;
@@ -290,11 +290,11 @@ public class Monitor {
     }
 
     public boolean isReadyToFinish(){
-        return allInvariatesCompleted;
+        return allInvariantsCompleted;
     }
 
     public void finish(){
-        allInvariatesCompleted = true;
+        allInvariantsCompleted = true;
         getMutex();
         System.out.println("Programa finalizado con: " + getBufferExported() + " invariantes");
         petri.printCounter();
