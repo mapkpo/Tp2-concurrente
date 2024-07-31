@@ -4,9 +4,9 @@ public class Main {
     public static void main(String[] args) {
 
         final int setpolitica = 1;     //politica 1 es 50/50, 2 es 80/20
-        final int numerodeimagenesaprocesar = 15;  //numero de invariantes que buscamos
-        final int numhilos1 = 1000;    //cargador, ajustador, recortador
-        final int numhilos2 = 1000;    //creador, exportador
+        final int numerodeimagenesaprocesar = 200;  //numero de invariantes que buscamos
+        final int numhilos1 = 2;    //cargador, ajustador 
+        final int numhilos2 = 1;    //creador, exportador, recortador
 
         //agregar un check flag a exportador andtes de llamar a la bandera
 
@@ -22,8 +22,8 @@ public class Main {
         Adjuster[] ajustadores = new Adjuster[numhilos1];
         Thread[] threadAjustadores = new Thread[numhilos1];
 
-        Trimmer[] recortadores = new Trimmer[numhilos1];
-        Thread[] threadRecortadores = new Thread[numhilos1];
+        Trimmer[] recortadores = new Trimmer[numhilos2];
+        Thread[] threadRecortadores = new Thread[numhilos2];
 
         Exporter[] exporter = new Exporter[numhilos2];
         Thread[] threadExportador = new Thread[numhilos2];
@@ -36,10 +36,6 @@ public class Main {
             ajustadores[i] = new Adjuster(monitor);
             threadAjustadores[i] = new Thread(ajustadores[i]);
             threadAjustadores[i].setName("Ajustador: " + i);
-
-            recortadores[i] = new Trimmer(monitor);
-            threadRecortadores[i] = new Thread(recortadores[i]);
-            threadRecortadores[i].setName("Recortador: " + i);
         }
 
         for(int i = 0; i < numhilos2; i++){
@@ -50,6 +46,10 @@ public class Main {
             exporter[i] = new Exporter(monitor, numerodeimagenesaprocesar);
             threadExportador[i] = new Thread(exporter[i]);
             threadExportador[i].setName("Exportador: " + i);
+
+            recortadores[i] = new Trimmer(monitor);
+            threadRecortadores[i] = new Thread(recortadores[i]);
+            threadRecortadores[i].setName("Recortador: " + i);
         }
 
         Log log = new Log(threadCreador, threadCargadores, threadAjustadores, threadRecortadores, threadExportador, monitor);
@@ -58,12 +58,12 @@ public class Main {
         for(int i = 0; i < numhilos1; i++){
             threadCargadores[i].start();
             threadAjustadores[i].start();
-            threadRecortadores[i].start();
         }
 
         for(int i = 0; i < numhilos2; i++){
             threadCreador[i].start();
             threadExportador[i].start();
+            threadRecortadores[i].start();
         }
     }
 }
