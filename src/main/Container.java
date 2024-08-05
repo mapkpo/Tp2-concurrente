@@ -10,7 +10,7 @@ public class Container {
         this.added = 0;
     }
 
-    void add(Image image){
+    public void add(Image image){
         this.images.add(image);
         addCounter();
     }
