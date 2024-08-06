@@ -1,8 +1,39 @@
 @startuml
 
+interface Runnable{}
+
+Runnable <|.. Adjuster
+Runnable <|.. Creator
+Runnable <|.. Exporter
+Runnable <|.. Loader
+Runnable <|.. Log
+Runnable <|.. Trimmer
+
+Container *-- Image 
+Monitor *-- Container
+Monitor *-- Rdp
+Monitor <|.. Politic
+Main o-- Politic
+
+Adjuster <|.. Monitor
+Creator <|.. Monitor
+Exporter <|.. Monitor
+Loader <|.. Monitor
+Log <|.. Monitor
+Trimmer <|.. Monitor
+
+Main o-- Adjuster
+Main o-- Creator
+Main o-- Exporter
+Main o-- Loader
+Main o-- Log
+Main o-- Trimmer
+Main o-- Monitor
+
+
 class Adjuster{
-    +Monitor monitor
-    +String threadName
+    ~Monitor monitor
+    ~String threadName
     -int counter
 
     +getCounter()
@@ -26,8 +57,8 @@ Class Container{
 }
 
 Class Creator{
-    +Monitor monitor
-    +String threadName
+    ~Monitor monitor
+    ~String threadName
     -AtomicInteger counter
     -int maxAmount
 
@@ -39,8 +70,8 @@ Class Creator{
 }
 
 Class Exporter{
-    +Monitor monitor
-    +String threadName
+    ~Monitor monitor
+    ~String threadName
     -AtomicInteger counter
     -int max
 
@@ -66,8 +97,8 @@ Class Image{
 }
 
 Class Loader{
-    +Monitor monitor
-    +String threadName
+    ~Monitor monitor
+    ~String threadName
 
     +Loader()
 
@@ -76,16 +107,16 @@ Class Loader{
 }
 
 Class Log{
-    +int count
-    +Thread[] threadCreator
-    +Thread[] threadLoader
-    +Thread[] threadAdjuster
-    +Thread[] threadTrimmers
-    +Thread[] threadExporters
-    +Monitor monitor
-    +File file
-    +File file1
-    +Long INITIAL_TIME
+    ~int count
+    ~Thread[] threadCreator
+    ~Thread[] threadLoader
+    ~Thread[] threadAdjuster
+    ~Thread[] threadTrimmers
+    ~Thread[] threadExporters
+    ~Monitor monitor
+    ~File file
+    ~File file1
+    ~Long INITIAL_TIME
 
     +Log()
 
@@ -120,13 +151,13 @@ Class Monitor{
     -Semaphore semCreate
     -Politic politic
     -boolean allInvariantsCompleted
-    +long startTime
-    +long endTime
-    +Container bufferIn
-    +Container bufferToProcess
-    +Container bufferToAdjust
-    +Container bufferReady
-    +Container bufferExported
+    ~long startTime
+    ~long endTime
+    ~Container bufferIn
+    ~Container bufferToProcess
+    ~Container bufferToAdjust
+    ~Container bufferReady
+    ~Container bufferExported
 
     +Monitor()
     +Image startLoading()
@@ -153,7 +184,7 @@ Class Monitor{
 }
 
 Class Politic{
-    +int politicType
+    ~int politicType
 
     +Politic()
     +int transitionNumber()
@@ -163,7 +194,7 @@ Class Rdp{
     -double[][] incidenceMatrix
     -double[] initialMarking
     -double[] transitionMatrix
-    +List<> transitionSleepTime
+    ~List<> transitionSleepTime
     -long[] transitionTime
     -int[] firedCount
     -String sequence
@@ -186,8 +217,8 @@ Class Rdp{
 }
 
 Class Trimmer{
-    +Monitor monitor
-    +String threadName
+    ~Monitor monitor
+    ~String threadName
     -int counter
 
     +Trimmer()
