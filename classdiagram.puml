@@ -1,34 +1,25 @@
 @startuml
 
-interface Runnable{}
-
-Runnable <|.. Adjuster
-Runnable <|.. Creator
-Runnable <|.. Exporter
-Runnable <|.. Loader
-Runnable <|.. Log
-Runnable <|.. Trimmer
-
-Container *-- Image 
+Container ..> Image 
 Monitor *-- Container
 Monitor *-- Rdp
-Monitor <|.. Politic
-Main o-- Politic
+Monitor o-- Politic
 
-Adjuster <|.. Monitor
-Creator <|.. Monitor
-Exporter <|.. Monitor
-Loader <|.. Monitor
-Log <|.. Monitor
-Trimmer <|.. Monitor
+Main *-- Adjuster
+Main *-- Creator
+Main *-- Exporter
+Main *-- Loader
+Main *-- Log
+Main *-- Monitor
+Main *-- Politic
+Main *-- Trimmer
 
-Main o-- Adjuster
-Main o-- Creator
-Main o-- Exporter
-Main o-- Loader
-Main o-- Log
-Main o-- Trimmer
-Main o-- Monitor
+Adjuster o-- Monitor
+Creator o-- Monitor
+Exporter o-- Monitor
+Loader o-- Monitor
+Log o-- Monitor
+Trimmer o-- Monitor
 
 
 class Adjuster{
