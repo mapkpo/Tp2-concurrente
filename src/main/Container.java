@@ -1,6 +1,8 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
+
 public class Container {
     private final ArrayList<Image> images;
     private int added;
@@ -13,6 +15,10 @@ public class Container {
     void add(Image image){
         this.images.add(image);
         addCounter();
+    }
+
+    void silentAdd(Image image){
+        this.images.add(image);
     }
 
     private void addCounter(){

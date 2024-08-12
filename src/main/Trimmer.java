@@ -4,11 +4,13 @@ package main;
 
 public class Trimmer implements Runnable{
     final Monitor monitor;
+    final Politic politic;
     String threadName;
     private int counter;
 
-    public Trimmer(Monitor monitor) {
+    public Trimmer(Monitor monitor, Politic politic) {
         this.monitor = monitor;
+        this.politic = politic;
         counter = 0;
     }
 
@@ -19,18 +21,23 @@ public class Trimmer implements Runnable{
         System.out.printf("%s inicializado\n", threadName);
 
         while (!monitor.isReadyToFinish()){
-            //System.out.println(threadName + ": Buscando imagen para recortar.");
-            Image img = monitor.startTrimming();
+            int firstTransition = politic.transitionNumber();
+            int lastTransition = firstTransition + 2;
+            if (!monitor.readRDP(firstTransition)){
+                continue;
+            }
 
-            // Si no hay imagenes para recortar, terminar
-            if (img == null)
-                break;
-
-            //System.out.println(threadName + ": Inciando recorte.");
+            Image img = monitor.getImageFromContainer(2, firstTransition);
+            if (img == null){
+                continue;
+            }
 
             img.trim();
-            monitor.finishTrim(img);
-            // System.out.println(threadName + ": Imagen recortada exitosamente.");
+            while (true) {
+                if (monitor.addImageToContainer(3, lastTransition, img)){
+                    break;
+                }
+            }
             counter++;
         }
     }

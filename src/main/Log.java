@@ -87,11 +87,11 @@ public class Log implements Runnable {
             try {
                 Long currentTime = System.currentTimeMillis();
                 writer.write("Iteración: " + count + " tiempo: " + (currentTime - INITIAL_TIME) + "ms\n");
-                writer.write("Imagenes creadas: " + monitor.getBufferP0() +"\n");
-                writer.write("Imagenes cargadas: "+ monitor.getBufferP6() +"\n");
-                writer.write("Imagenes ajustadas: "+ monitor.getBufferP14() +"\n");
-                writer.write("Imagenes recortadas: "+ monitor.getBufferP18() +"\n");
-                writer.write("Imagenes exportadas: "+ monitor.getBufferExported() +"\n");
+                writer.write("Imagenes creadas: " + monitor.getBufferCount(0) +"\n");
+                writer.write("Imagenes cargadas: "+ monitor.getBufferCount(1) +"\n");
+                writer.write("Imagenes ajustadas: "+ monitor.getBufferCount(2) +"\n");
+                writer.write("Imagenes recortadas: "+ monitor.getBufferCount(3) +"\n");
+                writer.write("Imagenes exportadas: "+ monitor.getBufferCount(4) +"\n");
                 writer.write(monitor.getBalanceCount() +"\n");
 
                 for (Thread thread: threadCreator){
@@ -126,7 +126,7 @@ public class Log implements Runnable {
         try {
             FileWriter writer = new FileWriter(file, true);
             try {
-                writer.write("Secuencia: "+ monitor.getSecuence() +"\n");
+                writer.write("Secuencia: "+ monitor.getSequence() +"\n");
                 
                 writer.write("\n\n");
             }
@@ -145,7 +145,7 @@ public class Log implements Runnable {
         try {
             FileWriter writer = new FileWriter(file1, false);
             try {
-                writer.write(monitor.getSecuence()+"\n");
+                writer.write(monitor.getSequence()+"\n");
                 }
             catch (IOException e){
                 System.out.println("Problema al escribir en el archivo de LOG.");

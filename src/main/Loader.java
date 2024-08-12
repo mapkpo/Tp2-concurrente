@@ -14,11 +14,23 @@ public class Loader implements Runnable{
         System.out.printf("%s inicializado\n", threadName);
 
         while (!monitor.isReadyToFinish()){
-            //System.out.println(threadName + ": Buscando imagen para cargar.");
-            Image img = monitor.startLoading();
+            int firstTransition = 1;
+            if (!monitor.readRDP(firstTransition))
+                firstTransition = 2;
+            if (!monitor.readRDP(firstTransition))
+                continue;
 
-            monitor.finishLoading(img);
-            //System.out.println(threadName + ": Imagen cargada exitósamente.");
+            int nextTransition = firstTransition + 2;
+            Image img = monitor.getImageFromContainer(0, firstTransition);
+            if (img == null){
+                continue;
+            }
+
+            // Can modify Image if necessary
+            while (true){
+                if (monitor.addImageToContainer(1, nextTransition, img))
+                    break;
+            }
         }
     }
 }
