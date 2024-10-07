@@ -1,292 +1,139 @@
 package main;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Monitor {
-    final private Rdp petri;
+    private final Rdp petri;
+    // Mutex protege el acceso a los contenedores
     final private Semaphore mutex;
-    final private Semaphore semProcess;
-    final private Semaphore semAdjust;
-    final private Semaphore semTrim;
-    final private Semaphore semExport;
     final private Politic politic;
-    final private Semaphore semCreate;
-    
+    final private ReentrantReadWriteLock petriRWLock;
 
     private boolean allInvariantsCompleted = false; //bandera para parar hilos
     long startTime;
     long endTime;
-   
-    Container bufferIn = new Container();     //P0
-    Container bufferToProcess = new Container();  //P6
-    Container bufferToAdjust = new Container();   //P14
-    Container bufferReady = new Container();   //P18
-    Container bufferExported = new Container();   //OUTPUT
 
+    Container[] buffers;
+    Semaphore[] containerSems;
 
-    public Monitor(Politic _politic){
+    public Monitor(Politic _politic, int containersAmount){
         petri = new Rdp();
         mutex = new Semaphore(1, true);
-        semProcess = new Semaphore(3);          //P3
-        semAdjust = new Semaphore(2);        //P9
-        semTrim = new Semaphore(1);       //P15
-        semExport = new Semaphore(1);       //P20
         politic = _politic;
-        semCreate = new Semaphore(1); //creo que es redundante
+
+        petriRWLock = new ReentrantReadWriteLock(true);
+        buffers = new Container[containersAmount];
+        containerSems = new Semaphore[containersAmount];
+        for (int i = 0; i < containersAmount; i++){
+            buffers[i] = new Container();
+            containerSems[i] = new Semaphore(1,true);
+        }
 
         startTime = System.currentTimeMillis();
     }
 
     /* Tries to acquire the mutex. */
-    private void getMutex() {
-        try{
+    private void getMutex() throws InterruptedException {
+        mutex.acquire();
+    }
+
+    private boolean writeRDP(int transition){
+        try {
+            petriRWLock.writeLock().lock();
+        } catch (Exception e){
+            return false;
+        }
+        if (!petri.isEnabled(transition)) {
+            petriRWLock.writeLock().unlock();
+            return false;
+        }
+        petri.fire(transition);
+        petriRWLock.writeLock().unlock();
+        return true;
+    }
+
+    public boolean shootTransition(int transition){
+        try {
             mutex.acquire();
         } catch (InterruptedException e){
-            System.out.println("Monitor: interrupted while trying to acquire mutex: " + e);
+            return false;
         }
+        boolean toReturn = writeRDP(transition);
+        mutex.release();
+        return toReturn;
     }
 
-    /* T0: Agrega una imagen al buffer de entrada. */
-    public void addImage(Image img) {
-        while(true){
-            getMutex();
-            if(petri.isEnabled(0))
-                break;
-            mutex.release();
+    public boolean readRDP(int transition){
+        try {
+            petriRWLock.readLock().lock();
+        } catch (Exception e){
+            return false;
         }
-
-        petri.fire(0);
-        bufferIn.add(img);
-        semCreate.release();
-        mutex.release();
+        boolean toReturn = petri.isEnabled(transition);
+        petriRWLock.readLock().unlock();
+        return toReturn;
     }
 
-    /* T1|T2: Toma una imagen del buffer de entrada. */
-    public Image startLoading() {
-        int T = 1;
-        while(true){
-            try{
-                semProcess.acquire();
-            } catch (InterruptedException e){
-                System.out.println("Monitor: interrupted while trying to acquire s_proc: " + e);
-            }
-            getMutex();
-
-            if(isReadyToFinish()){
-                mutex.release();
-                semProcess.release();
-                return null;
-            }
-
-            if(petri.isEnabled(1))
-                break;
-            else if(petri.isEnabled(2)){
-                T = 2;
-                break;
-            }
-            mutex.release();
-            semProcess.release();
+    public boolean addImageToContainer(int containerNum, int transition, Image image){
+        try {
+            containerSems[containerNum].acquire();
+        } catch (Exception e){
+            return false;
         }
-        petri.fire(T);
-        Image toProcess = bufferIn.getImage();
+
+        try {
+            mutex.acquire();
+        } catch (InterruptedException e){
+            containerSems[containerNum].release();
+            return false;
+        }
+
+        if (!writeRDP(transition)) {
+            containerSems[containerNum].release();
+            mutex.release();
+            return false;
+        }
+
+        buffers[containerNum].add(image);
+        containerSems[containerNum].release();
         mutex.release();
-        return toProcess;
+        return true;
     }
 
-    /* T3|T4: Carga la imagen al buffer de imagenes a procesar. */
-    public void finishLoading(Image img){
-        int T = 3;
-        while (true){
-            getMutex();
-            if(isReadyToFinish()){
-                mutex.release();
-                return;
-            }
-            if(petri.isEnabled(3))
-                break;
-            if(petri.isEnabled(4)){
-                T = 4;
-                break;
-            }
-            mutex.release();
+    public Image getImageFromContainer(int containerNum, int transition){
+        try {
+            containerSems[containerNum].acquire();
+        } catch (Exception e){
+            return null;
         }
-        petri.fire(T);
-        bufferToProcess.add(img);
-        mutex.release();
-        semProcess.release();
-    }
 
-    /* T5|T6: Toma una imagen del buffer a procesar. */
-    public Image startAdjust(){
-        int T = 5;
-        while (true){
-            try{
-                semAdjust.acquire();
-            } catch (InterruptedException e){
-                System.out.println("Monitor: interrupted while trying to acquire s_ajuste: " + e);
-            }
-            getMutex();
-
-            if(isReadyToFinish()){
-                mutex.release();
-                semAdjust.release();
-                return null;
-            }
-
-            if(petri.isEnabled(5))
-                break;
-            if(petri.isEnabled(6)){
-                T = 6;
-                break;
-            }
-            semAdjust.release();
-            mutex.release();
+        try {
+            mutex.acquire();
+        } catch (InterruptedException e){
+            containerSems[containerNum].release();
+            return null;
         }
-        petri.fire(T);
-        Image toAdjust = bufferToProcess.getImage();
-        mutex.release();
-        return toAdjust;
-    }
 
-    /* T7|T8: Dispara la transicion correspondiente en la RDP. */
-    public void midAdjust(){
-        int T = 7;
-        while (true){
-            getMutex();
-
-            if(isReadyToFinish()){
-                mutex.release();
-                semAdjust.release();
-                return;
-            }
-
-            if(petri.isEnabled(7))
-                break;
-            if(petri.isEnabled(8)){
-                T = 8;
-                break;
-            }
+        // Hay realmente una imagen para tomar?
+        Image toReturn = buffers[containerNum].getImage();
+        if (toReturn == null){
+            containerSems[containerNum].release();
             mutex.release();
+            return null;
         }
-        petri.fire(T);
-        mutex.release();
-    }
 
-    /* T9|T10: Agrega una imagen ya ajustada al bufffer de ajustadas. */
-    public void finishAdjust(Image img){
-        int T = 9;
-        while (true){
-            getMutex();
-
-            if(isReadyToFinish()){
-                mutex.release();
-                semAdjust.release();
-                return;
-            }
-
-            if(petri.isEnabled(9))
-                break;
-            if(petri.isEnabled(10)){
-                T = 10;
-                break;
-            }
+        //Está realmente sensibilizada la transición?
+        if (!writeRDP(transition)) {
+            // Sino volvemos a guardar la imágen
+            buffers[containerNum].silentAdd(toReturn);
+            containerSems[containerNum].release();
             mutex.release();
+            return null;
         }
-        petri.fire(T);
-        bufferToAdjust.add(img);
-        semAdjust.release();
+
+        containerSems[containerNum].release();
         mutex.release();
-    }
-
-    /* T11|T12: Toma una imagen para ser recortada. */
-    public Image startTrimming(){
-        int T;
-        while (true){
-            try{
-                semTrim.acquire();
-            } catch (InterruptedException e){
-                System.out.println("Monitor: interrupted while trying to acquire s_recorte: " + e);
-            }
-            getMutex();
-            
-            // Verificacion de finalizacion
-            if(isReadyToFinish()){
-                semTrim.release();
-                mutex.release();
-                return null;
-            }
-
-            if(petri.isEnabled(11) && petri.isEnabled(12)){
-                T = politic.transitionNumber();
-                break;
-            }
-
-            semTrim.release();
-            mutex.release();
-        }
-        petri.fire(T);
-        Image toTrim = bufferToAdjust.getImage();
-        mutex.release();
-        return toTrim;
-    }
-    
-
-    /* T13|T14: Carga las imagenes ya recortadas al buffer final. */
-    public void finishTrim(Image img){
-        int T = 13;
-        while (true){
-            getMutex();
-            if(petri.isEnabled(13))
-                break;
-            if(petri.isEnabled(14)){
-                T = 14;
-                break;
-            }
-            mutex.release();
-        }
-        petri.fire(T);
-        bufferReady.add(img);
-        semTrim.release();
-        mutex.release();
-    }
-
-    /* T15: Toma una imagen para exportarla. */
-    public Image startExport(){
-        while (true){
-            try{
-                semExport.acquire();
-            } catch (InterruptedException e){
-                System.out.println("Monitor: interrupted while trying to acquire s_exporta: " + e);
-            }
-            getMutex();
-            if(allInvariantsCompleted){
-                semExport.release();
-                mutex.release();
-                return null;
-            }
-            if(petri.isEnabled(15))
-                break;
-            semExport.release();
-            mutex.release();
-        }
-        petri.fire(15);
-        Image toExport = bufferReady.getImage();
-        mutex.release();
-        return toExport;
-    }
-
-    /* T16: Carga la imagen en el buffer de exportadas. */
-    public void finishExport(Image img){
-        while (true){
-            getMutex();
-            if(petri.isEnabled(16))
-                break;
-            mutex.release();
-        }
-        endTime = System.currentTimeMillis();
-        petri.fire(16);
-        bufferExported.add(img);
-        semExport.release();
-        mutex.release();
+        return toReturn;
     }
 
     public boolean isReadyToFinish(){
@@ -295,35 +142,23 @@ public class Monitor {
 
     public void finish(){
         allInvariantsCompleted = true;
-        getMutex();
-        System.out.println("Programa finalizado con: " + getBufferExported() + " invariantes");
+        try {
+            getMutex();
+        } catch (InterruptedException ignored){
+
+        }
+        System.out.println("Programa finalizado con: " + buffers[buffers.length - 1].getAdded() + " invariantes");
         petri.printCounter();
         mutex.release();
         //System.out.print(petri.getSecuencia());
     }
 
-    public String getSecuence(){
+    public String getSequence(){
         return petri.getSequence();
     }
 
-    public int getBufferP0(){
-        return bufferIn.getAdded();
-    }
-
-    public int getBufferP6(){
-        return bufferToProcess.getAdded();
-    }
-
-    public int getBufferP14(){
-        return bufferToAdjust.getAdded();
-    }
-
-    public int getBufferP18(){
-        return bufferReady.getAdded();
-    }
-
-    public int getBufferExported(){
-        return bufferExported.getAdded();
+    public int getBufferCount(int bufferNum){
+        return buffers[bufferNum].getAdded();
     }
 
     public String getBalanceCount(){

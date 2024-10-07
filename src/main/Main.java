@@ -11,7 +11,7 @@ public class Main {
         //agregar un check flag a exportador andtes de llamar a la bandera
 
         Politic politic = new Politic(setpolitica);
-        Monitor monitor = new Monitor(politic);
+        Monitor monitor = new Monitor(politic, 5);
 
         Creator[] creator = new Creator[numhilos2];
         Thread[] threadCreador = new Thread[numhilos2];
@@ -47,7 +47,7 @@ public class Main {
             threadExportador[i] = new Thread(exporter[i]);
             threadExportador[i].setName("Exportador: " + i);
 
-            recortadores[i] = new Trimmer(monitor);
+            recortadores[i] = new Trimmer(monitor, politic);
             threadRecortadores[i] = new Thread(recortadores[i]);
             threadRecortadores[i].setName("Recortador: " + i);
         }

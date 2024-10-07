@@ -9,9 +9,9 @@ public class Creator implements Runnable{
     private static final AtomicInteger counter = new AtomicInteger(0);
     private final int maxAmmount;
 
-    public Creator(Monitor monitor, int ammount) {
+    public Creator(Monitor monitor, int amount) {
         this.monitor = monitor;
-        maxAmmount = ammount;
+        maxAmmount = amount;
     }
 
     @Override
@@ -20,10 +20,11 @@ public class Creator implements Runnable{
         System.out.printf("%s inicializado\n", threadName);
 
         while (!monitor.isReadyToFinish() && counter.get() < maxAmmount){
+            // la transición 0 siempre está sensibilizada, no hace falta revisar
+            if (!monitor.addImageToContainer(0, 0, new Image())){
+                continue;
+            }
             counter.incrementAndGet();
-            //Espera a poder tomar control del mutex del monitor para agregar la imagen al contenedor P0.
-            monitor.addImage(new Image());
-            //System.out.println(threadName + ": Nueva imagen creada con éxito.");
         }
     }
 
