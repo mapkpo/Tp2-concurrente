@@ -19,15 +19,19 @@ public class Exporter implements Runnable{
         System.out.printf("%s inicializado\n", threadName);
 
         while (counter.get() < max && !monitor.isReadyToFinish()){
-            //System.out.println(threadName + ": Buscando imagen para exportar.");
-            Image img = monitor.startExport();
+            if (!monitor.readRDP(15))
+                continue;
 
-            if(monitor.isReadyToFinish()){
-                break;
+            Image img = monitor.getImageFromContainer(3, 15);
+            if(img == null)
+                continue;
+
+            // Modify Image if necessary
+            while (true){
+                if (monitor.addImageToContainer(4, 16, img)) {
+                    break;
+                }
             }
-
-            monitor.finishExport(img);
-            //System.out.println(threadName + ": Imagen exportada exitósamente.");
             counter.incrementAndGet();
         }
         monitor.finish();

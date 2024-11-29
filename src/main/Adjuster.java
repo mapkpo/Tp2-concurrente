@@ -16,15 +16,32 @@ public class Adjuster implements Runnable{
         System.out.printf("%s inicializado\n", threadName);
 
         while (!monitor.isReadyToFinish()){
-            //System.out.println(threadName + ": Buscando imagen para ajustar.");
-            Image img = monitor.startAdjust();
+            int firstTransition = 5;
+            if (!monitor.readRDP(firstTransition))
+                firstTransition = 6;
+            if (!monitor.readRDP(firstTransition))
+                continue;
 
-            monitor.midAdjust();
-            //System.out.println(threadName + ": Ajuste inicial finalizado exitosamente.");
-            //System.out.println(threadName + ": Iniciando ajuste final.");
+            int midTransition = firstTransition + 2;
+            int finalTransition = midTransition + 2;
 
-            monitor.finishAdjust(img);
-            //System.out.println(threadName + ": Ajuste final finalizado exitosamente.");
+            Image img = monitor.getImageFromContainer(1, firstTransition);
+            if (img == null){
+                continue;
+            }
+
+            img.firstAdjustment();
+            while (true) {
+                if (monitor.shootTransition(midTransition)){
+                    break;
+                }
+            }
+            img.finalAdjustment();
+            while (true) {
+                if (monitor.addImageToContainer(2, finalTransition, img)){
+                    break;
+                }
+            }
             counter++;
         }
     }
