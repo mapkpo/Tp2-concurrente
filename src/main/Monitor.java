@@ -13,6 +13,8 @@ public class Monitor {
     long startTime;
     long endTime;
 
+
+    /// TODO: Remove from Monitor
     Container[] buffers;
     Semaphore[] containerSems;
 
@@ -43,13 +45,10 @@ public class Monitor {
         } catch (Exception e){
             return false;
         }
-        if (!petri.isEnabled(transition)) {
-            petriRWLock.writeLock().unlock();
-            return false;
-        }
-        petri.fire(transition);
+
+        boolean return_value = petri.fire(transition);
         petriRWLock.writeLock().unlock();
-        return true;
+        return return_value;
     }
 
     public boolean shootTransition(int transition){
@@ -74,6 +73,7 @@ public class Monitor {
         return toReturn;
     }
 
+    /// TODO: Remove from Monitor
     public boolean addImageToContainer(int containerNum, int transition, Image image){
         try {
             containerSems[containerNum].acquire();
@@ -100,6 +100,7 @@ public class Monitor {
         return true;
     }
 
+    /// TODO: Remove from Monitor
     public Image getImageFromContainer(int containerNum, int transition){
         try {
             containerSems[containerNum].acquire();

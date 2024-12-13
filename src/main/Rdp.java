@@ -104,7 +104,7 @@ public class Rdp {
         return lista;
     }
 
-    public void fire(int a){
+    public boolean fire(int a){
         testPlaceInvariant();
         if(isEnabled(a)){
             RealVector adisparar1 = transition.copy();
@@ -125,7 +125,9 @@ public class Rdp {
             }
 
             firedCount[a]++;
+            return true;
         }
+        return false;
     }
 
     private void updateMarking(RealVector a){
