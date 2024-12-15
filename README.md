@@ -1,3 +1,4 @@
 ## cosas a hacer
 
-- poner tiempo a los hilos en el wait(?) 
+- sistema de colas
+- adecuar el log a este nuevo codigo
