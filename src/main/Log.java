@@ -8,8 +8,10 @@ import java.util.Date;
 public class Log implements Runnable {
     int count;
     Threads[] threadCreator;
-    Threads[] threadLoader;
-    Threads[] threadAdjusters;
+    Threads[] threadLeftLoader;
+    Threads[] threadRightLoader;
+    Threads[] threadLeftAdjusters;
+    Threads[] threadRightAdjusters;
     Threads[] threadTrimmers;
     Threads[] threadExporters;
     Monitor monitor;
@@ -17,10 +19,12 @@ public class Log implements Runnable {
     File file1;
     final Long INITIAL_TIME = System.currentTimeMillis();
     
-    public Log(Threads[] threadCreator, Threads[] threadLoader, Threads[] threadAdjusters, Threads[] threadTrimmers, Threads[] threadExporters, Monitor monitor){
+    public Log(Threads[] threadCreator, Threads[] threadLeftLoader, Threads[] threadRightLoader, Threads[] threadLeftAdjusters, Threads[] threadRightAdjusters, Threads[] threadTrimmers, Threads[] threadExporters, Monitor monitor){
         this.threadCreator = threadCreator;
-        this.threadLoader = threadLoader;
-        this.threadAdjusters = threadAdjusters;
+        this.threadLeftLoader = threadLeftLoader;
+        this.threadRightLoader = threadRightLoader;
+        this.threadLeftAdjusters = threadLeftAdjusters;
+        this.threadRightAdjusters = threadRightAdjusters;
         this.threadTrimmers = threadTrimmers;
         this.threadExporters = threadExporters;
         this.monitor = monitor;
@@ -87,20 +91,26 @@ public class Log implements Runnable {
             try {
                 Long currentTime = System.currentTimeMillis();
                 writer.write("Iteración: " + count + " tiempo: " + (currentTime - INITIAL_TIME) + "ms\n");
-                writer.write("Imagenes creadas: "+ monitor.getRdp().getMarking(0) +"\n");
-                writer.write("Imagenes cargadas: "+ monitor.getRdp().getMarking(6) +"\n");
-                writer.write("Imagenes ajustadas: "+ monitor.getRdp().getMarking(14) +"\n");
-                writer.write("Imagenes recortadas: "+ monitor.getRdp().getMarking(18) +"\n");
+                writer.write("Imagenes creadas: "+ monitor.getRdp().getFiredCounter()[0] +"\n");
+                writer.write("Imagenes cargadas: "+ (monitor.getRdp().getFiredCounter()[3] + monitor.getRdp().getFiredCounter()[4])  +"\n");
+                writer.write("Imagenes ajustadas: "+ (monitor.getRdp().getFiredCounter()[9] + monitor.getRdp().getFiredCounter()[10]) +"\n");
+                writer.write("Imagenes recortadas: "+ (monitor.getRdp().getFiredCounter()[13] + monitor.getRdp().getFiredCounter()[14]) +"\n");
                 writer.write("Imagenes exportadas: "+ monitor.getRdp().getFiredCounter()[16] +"\n");
                 //writer.write(monitor.getBalanceCount() +"\n");
 
                 for (Threads thread: threadCreator){
                     writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
-                for (Threads thread: threadLoader){
+                for (Threads thread: threadLeftLoader){
                     writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
-                for (Threads thread: threadAdjusters){
+                for (Threads thread: threadRightLoader){
+                    writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
+                }
+                for (Threads thread: threadLeftAdjusters){
+                    writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
+                }
+                for (Threads thread: threadRightAdjusters){
                     writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
                 for (Threads thread: threadTrimmers){

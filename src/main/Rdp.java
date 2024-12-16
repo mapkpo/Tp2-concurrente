@@ -102,25 +102,6 @@ public class Rdp {
         }
 
         return lista;
-
-        // for (int i = 0; i < transition.getDimension(); i++) {
-        //     RealVector aprobar = transition.copy();
-        //     aprobar.setEntry(i, 1);
-
-        //     int contador = 0;
-
-        //     RealVector result = incidence.operate(aprobar).add(marking);
-        //     for (int j = 0; j < result.getDimension(); j++) {
-        //         if (result.getEntry(j) < 0) {
-        //             //System.out.println("Fuera de rango");
-        //             contador++;
-        //         }
-        //     }
-        //     if (contador == 0){
-        //         lista.add(i);
-        //     }
-        // }
-        // return lista;
     }
 
     public void fire(int a){
@@ -134,7 +115,6 @@ public class Rdp {
             updateMarking(nuevomarcado);
 
             transitionTime[a] = -1;
-            //issensibilizada(a); al pedo
 
             //sin hacer esto el programa de python para comprobar la expresion regular aveces (20% del tiempo) falla ya que se come una T0 y lo deja como 0 solo, entonces
             //interpreta un invariante menos debido a ese error, haciendo que sea T00 se soluciona y funciona siempre
@@ -162,19 +142,6 @@ public class Rdp {
     public int getMarking(int place){
         return ((int)marking.getEntry(place));
     }
-
-    // public void printCounter(){ //este valor siempre va a ser mayor al numero de invariantes deseados debido a que la red 
-    //     //se sigue disparando hasta que se paran todos los hilos.
-    //         System.out.print("Contador del balanceo de la politica: ");
-    //         System.out.print(firedCount[11]);
-    //         System.out.print(" , ");
-    //         System.out.print(firedCount[12]);
-    //         System.out.println();
-    // }
-
-    // public String counterString(){
-    //     return ("Contador del balanceo de la política: "+ firedCount[11]+" , "+ firedCount[12]);
-    // }
 
     private void testPlaceInvariant(){
         boolean p1, p2, p3, p4, p5, p6, p7, p8;
