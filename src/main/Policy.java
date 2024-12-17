@@ -15,23 +15,23 @@ public class Policy {
         Random rand = new Random();
         double probability = rand.nextDouble();
 
+        System.out.println("Habilitadas para elegir disparo " + transitions);
+
         if (transitions.contains(11) && transitions.contains(12)){
 
-            //System.out.println("entro aca");
             if (policyTypeEquitative == true){
-                if (probability < 0.5){
+                if (probability <= 0.5){
                     return 11;
                 } else return 12;
             }
 
             if (policyTypeEquitative == false){
-                if (probability < 0.8){
+                if (probability <= 0.8){
                     return 11;
                 } else return 12;
             }
         }   
         
-        //Random randd = new Random();
         if (transitions.size() == 1){
             return transitions.get(0);
         }

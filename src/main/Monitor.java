@@ -15,31 +15,19 @@ public class Monitor {
         this.policy = policy;
     }
 
-    //public Boolean fireTransition(int transition) {
     public Boolean fireTransition(List<Integer> transitions) {
         mutex.lock();
         finish(); 
         try {
-            //aca hay problema xddddd
             List<Integer> toTry = rdp.whichEnabled();
-            //System.out.println("las enableadas "+ toTry.size());
 
-            // for (int i=0; i<toTry.size(); i++){
-            //     System.out.println("dmdjdjjd "+toTry.get(i));
-            // }
-
-            toTry.removeAll(transitions);
-
-            System.out.println(toTry);
-            //System.out.println(transitions);
-            System.out.println("------------------------------");
+            toTry.retainAll(transitions);
 
             if(toTry.size() == 0){
                 return false;
             }
 
             int number = policy.decide(toTry);
-            System.out.println("aca ta la cagá "+number);
 
             if (rdp.isEnabled(number)) {
                 System.out.println("Firing transition: T" + number);

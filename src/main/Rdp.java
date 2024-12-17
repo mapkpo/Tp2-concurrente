@@ -146,13 +146,6 @@ public class Rdp {
     private void testPlaceInvariant(){
         boolean p1, p2, p3, p4, p5, p6, p7, p8;
 
-        /*
-        for(int i=0; i<21; i++){
-            System.out.print("plaza: "+i+""+marcado.getEntry(i)+" , ");
-        }
-        System.out.println();
-        */
-
         p1 = ((((int) marking.getEntry(1))+((int) marking.getEntry(2))) == 1);
         p2 = ((((int) marking.getEntry(4))+((int) marking.getEntry(5))) == 1);
         p3 = ((((int) marking.getEntry(19))+((int) marking.getEntry(20))) == 1);
