@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 public class Rdp {
+    public int transitionsNo = 17;
     private final double[][] incidenceMatrix = {
 
         //  t0  t1  t2   t3  t4  t5  t6  t7  t8  t9  t10 t11 t12 t13 t14 t15 t16
@@ -96,7 +97,7 @@ public class Rdp {
         List<Integer> lista = new ArrayList<>();
 
         for (int i=0; i<17; i++){
-            if(isEnabled(i)==true){
+            if(isEnabled(i)){
                 lista.add(i);
             }
         }
@@ -168,10 +169,7 @@ public class Rdp {
     }
 
     public Boolean completedInvariants(){
-        if (firedCount[16] == maxInvariant){
-            return true;
-        }
-        else return false;
+        return firedCount[16] == maxInvariant;
     }
 
     public int[] getFiredCounter(){

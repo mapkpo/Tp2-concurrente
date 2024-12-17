@@ -1,5 +1,6 @@
 package main;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
@@ -7,15 +8,21 @@ public class Monitor {
     private final ReentrantLock mutex;
     private boolean allInvariantsCompleted;
     private Policy policy;
+    private Semaphore[] transitionSems;
 
     public Monitor(Rdp rdp, Policy policy) {
         this.rdp = rdp;
         this.mutex = new ReentrantLock();
         allInvariantsCompleted = false;
         this.policy = policy;
+        transitionSems = new Semaphore[rdp.transitionsNo];
+        for (int i = 0; i < transitionSems.length; i++){
+            transitionSems[i] = new Semaphore(1, true);
+        }
     }
 
     public Boolean fireTransition(List<Integer> transitions) {
+        int number = -1;
         mutex.lock();
         finish(); 
         try {
@@ -23,11 +30,24 @@ public class Monitor {
 
             toTry.retainAll(transitions);
 
-            if(toTry.size() == 0){
+            if(toTry.isEmpty()){
                 return false;
             }
 
-            int number = policy.decide(toTry);
+            number = policy.decide(toTry);
+
+            // Verifico si el recurso esta disponible
+            if(!transitionSems[number].tryAcquire()){
+                mutex.unlock();
+                // Sino ingreso a la cola
+                try {
+                    transitionSems[number].acquire();
+                } catch (InterruptedException e) {
+                    return false;
+                }
+                mutex.lock();
+            }
+
 
             if (rdp.isEnabled(number)) {
                 System.out.println("Firing transition: T" + number);
@@ -38,6 +58,9 @@ public class Monitor {
                 return false;
             }
         } finally {
+            if (number != -1) {
+                transitionSems[number].release();
+            }
             mutex.unlock(); 
         }
     }
