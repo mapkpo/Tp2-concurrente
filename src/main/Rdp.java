@@ -45,10 +45,6 @@ public class Rdp {
     List<Integer> transitionSleepTime = Collections.unmodifiableList
             (Arrays.asList(0, 0, 0, 100, 100, 0, 0, 100, 100, 100, 100, 0, 0, 100, 100, 0, 100));
 
-    // List<Integer> transitionSleepTime = Collections.unmodifiableList
-    //         (Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-
-
     private final long[] transitionTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private int[] firedCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -87,7 +83,7 @@ public class Rdp {
 
             if (transitionTime[a] == -1)
                 transitionTime[a] = System.currentTimeMillis();
-            return (System.currentTimeMillis() - transitionTime[a] > transitionSleepTime.get(a));
+            return (System.currentTimeMillis() - transitionTime[a] >= transitionSleepTime.get(a));
         }
         System.out.println(a + "esta fuera de rango");
         return false;
