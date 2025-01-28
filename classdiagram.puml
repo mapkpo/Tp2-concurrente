@@ -1,222 +1,122 @@
 @startuml
 
-Container ..> Image 
-Monitor *-- Container
-Monitor *-- Rdp
-Monitor o-- Politic
-
-Main *-- Adjuster
-Main *-- Creator
-Main *-- Exporter
-Main *-- Loader
-Main *-- Log
-Main *-- Monitor
-Main *-- Politic
-Main *-- Trimmer
-
-Adjuster o-- Monitor
-Creator o-- Monitor
-Exporter o-- Monitor
-Loader o-- Monitor
-Log o-- Monitor
-Trimmer o-- Monitor
-
-
-class Adjuster{
-    ~Monitor monitor
-    ~String threadName
-    -int counter
-
-    +getCounter()
-
-    {abstract} void methods()
-    +run()
+' Main Class
+class Main {
+    - int maxFiresForT0
+    - Policy policy
+    - int creatorThreads
+    - int loaderThreadsLeft
+    - int loaderThreadsRight
+    - int adjustersThreadsLeft
+    - int adjustersThreadsRight
+    - int trimmersThreads
+    - int exportersThreads
+    - List<Integer> creator
+    - List<Integer> LL
+    - List<Integer> LR
+    - List<Integer> AL
+    - List<Integer> AR
+    - List<Integer> T
+    - List<Integer> E
+    - Rdp rdp
+    - Monitor monitor
+    - Threads[] creators
+    - Threads[] loadersLeft
+    - Threads[] loadersRight
+    - Threads[] adjustersLeft
+    - Threads[] adjustersRight
+    - Threads[] trimmers
+    - Threads[] exporters
+    + void main(String[] args)
 }
 
-Class Container{
-    -ArrayList images
-    -int added
-
-    +Container()
-    +int getAdded()
-    +image getImage()
-    
-    {abstract} void methods()
-    +add()
-    -addCounter()
-    +removeImage()
+' Monitor Class
+class Monitor {
+    - Rdp rdp
+    - ReentrantLock mutex
+    - boolean allInvariantsCompleted
+    - Policy policy
+    - Semaphore[] transitionSems
+    + Monitor(Rdp rdp, Policy policy)
+    + Boolean fireTransition(List<Integer> transitions)
+    - void finish()
+    + boolean areInvariantsCompleted()
+    + Rdp getRdp()
 }
 
-Class Creator{
-    ~Monitor monitor
-    ~String threadName
-    -AtomicInteger counter
-    -int maxAmount
-
-    +Creator()
-    +int getCounter()
-
-    {abstract} void methods()
-    +run()
+' Policy Class
+class Policy {
+    - boolean policyTypeEquitative
+    - Random rand
+    + Policy(boolean a)
+    + int decide(List<Integer> transitions)
 }
 
-Class Exporter{
-    ~Monitor monitor
-    ~String threadName
-    -AtomicInteger counter
-    -int max
-
-    +Exporter()
-    +int getContador
-
-    {abstract} void methods()
-    +run()
+' Rdp Class
+class Rdp {
+    - int transitionsNo
+    - double[][] incidenceMatrix
+    - double[] initialMarking
+    - double[] transitionMatrix
+    - List<Integer> transitionSleepTime
+    - long[] transitionTime
+    - int[] firedCount
+    - String sequence
+    - int maxInvariant
+    - RealMatrix incidence
+    - RealVector marking
+    - RealVector transition
+    + Rdp(int max)
+    + boolean isEnabled(int a)
+    + List<Integer> whichEnabled()
+    + void fire(int a)
+    - void updateMarking(RealVector a)
+    + void printMarking()
+    + int getMarking(int place)
+    - void testPlaceInvariant()
+    + String getSequence()
+    + Boolean completedInvariants()
+    + int[] getFiredCounter()
 }
 
-Class Image{
-    -boolean trimmed
-    -boolean[] adjusted
-
-    +Image()
-    +boolean isTrimmed()
-    +boolean getAdjusted()
-
-    {abstract} void methods()
-    +trim()
-    +firstAdjustment()
-    +finalAdjustment()
+' Threads Class
+class Threads {
+    - List<Integer> transitions
+    - Monitor monitor
+    + Threads(List<Integer> transitions, Monitor monitor)
+    + void run()
 }
 
-Class Loader{
-    ~Monitor monitor
-    ~String threadName
-
-    +Loader()
-
-    {abstract} void methods()
-    +run()
+' Log Class
+class Log {
+    - int count
+    - Threads[] threadCreator
+    - Threads[] threadLeftLoader
+    - Threads[] threadRightLoader
+    - Threads[] threadLeftAdjusters
+    - Threads[] threadRightAdjusters
+    - Threads[] threadTrimmers
+    - Threads[] threadExporters
+    - Monitor monitor
+    - File file
+    - File file1
+    - Long INITIAL_TIME
+    + Log(Threads[] threadCreator, Threads[] threadLeftLoader, Threads[] threadRightLoader, Threads[] threadLeftAdjusters, Threads[] threadRightAdjusters, Threads[] threadTrimmers, Threads[] threadExporters, Monitor monitor)
+    + void run()
+    - void writeFile()
+    - void logWriteSequence()
+    - void writeSequenceOnly()
 }
 
-Class Log{
-    ~int count
-    ~Thread[] threadCreator
-    ~Thread[] threadLoader
-    ~Thread[] threadAdjuster
-    ~Thread[] threadTrimmers
-    ~Thread[] threadExporters
-    ~Monitor monitor
-    ~File file
-    ~File file1
-    ~Long INITIAL_TIME
-
-    +Log()
-
-    {abstract} void methods()
-    +run()
-    -writeFile()
-    -logWriteSequence()
-    -writeSequenceOnly()
-}
-
-Class Main{
-    +int setpolitica
-    +int numerodeimagenesaprocesar
-    +int numhilos1
-    +int numhilos2
-    +Politic politic
-    +Monitor monitor
-    +Creator[] creator
-    +Loader[] cargadores
-    +Adjuster[] ajustadores
-    +Trimmer[] recortadores
-    +Exporter[] exporter
-}
-
-Class Monitor{
-    -Rdp petri
-    -Semaphore mutex
-    -Semaphore semProcess
-    -Semaphore semAdjust
-    -Semaphore semTrim
-    -Semaphore semExport
-    -Semaphore semCreate
-    -Politic politic
-    -boolean allInvariantsCompleted
-    ~long startTime
-    ~long endTime
-    ~Container bufferIn
-    ~Container bufferToProcess
-    ~Container bufferToAdjust
-    ~Container bufferReady
-    ~Container bufferExported
-
-    +Monitor()
-    +Image startLoading()
-    +Image startAdjust()
-    +Image startTrimming()
-    +Image startExport()
-    +String getSecuence()
-    +int getBufferP0()
-    +int getBufferP6()
-    +int getBufferP14()
-    +int getBufferP18()
-    +int getBufferExported()
-    +String getBalanceCount()
-
-    {abstract} void methods()
-    -getMutex()
-    +addImage()
-    +finishLoading()
-    +midAdjust()
-    +finishAdjust()
-    +finishTrim()
-    +finishExport()
-    +finish()
-}
-
-Class Politic{
-    ~int politicType
-
-    +Politic()
-    +int transitionNumber()
-}
-
-Class Rdp{
-    -double[][] incidenceMatrix
-    -double[] initialMarking
-    -double[] transitionMatrix
-    ~List<> transitionSleepTime
-    -long[] transitionTime
-    -int[] firedCount
-    -String sequence
-    -RealMatrix incidence
-    -RealVector marking
-    -RealVector transition
-
-    +Rdp()
-    +boolean isEnabled()
-    +List<Integer> whichEnabled()
-    +String counterString()
-    +String getSequence()
-
-    {abstract} void methods()
-    +fire()
-    -updateMarking()
-    +printMarking()
-    +printCounter()
-    -testPlaceInvariant()
-}
-
-Class Trimmer{
-    ~Monitor monitor
-    ~String threadName
-    -int counter
-
-    +Trimmer()
-    +int getCounter()
-
-    {abstract} void methods()
-    +run()
-}
+' Relationships
+Main --> Monitor
+Main --> Policy
+Main --> Rdp
+Main --> Threads
+Monitor --> Rdp
+Monitor --> Policy
+Threads --> Monitor
+Log --> Monitor
+Log --> Threads
 
 @enduml

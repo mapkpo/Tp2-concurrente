@@ -6,15 +6,15 @@ public class Main {
     public static void main(String[] args) {
         
         int maxFiresForT0 = 200; // Límite máximo de disparos para la transición 0
-        Policy policy = new Policy(false);   //true es equitativo, false es 8020
+        Policy policy = new Policy(true);   //true es equitativo, false es 8020
 
-        int creatorThreads = 2;
-        int loaderThreadsLeft = 2;
-        int loaderThreadsRight = 2;
-        int adjustersThreadsLeft = 2;
-        int adjustersThreadsRight = 2;
-        int trimmersThreads = 2;
-        int exportersThreads = 2;
+        int creatorThreads = 1;
+        int loaderThreadsLeft = 1;
+        int loaderThreadsRight = 1;
+        int adjustersThreadsLeft = 1;
+        int adjustersThreadsRight = 1;
+        int trimmersThreads = 1;
+        int exportersThreads = 1;
 
         List<Integer> creator = new ArrayList();
         creator.add(0);
