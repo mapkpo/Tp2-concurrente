@@ -5,7 +5,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         
-        int maxFiresForT0 = 200; // Límite máximo de disparos para la transición 0
+        int maxFiresForT0 = 1; // Límite máximo de disparos para la transición 0
         Policy policy = new Policy(true);   //true es equitativo, false es 8020
 
         int creatorThreads = 1;
@@ -79,12 +79,12 @@ public class Main {
 
         for (int i = 0; i < trimmersThreads; i++){
             trimmers[i] = new Threads(T, monitor);
-            trimmers[i].setName("Trimmers " + i);
+            trimmers[i].setName("Trimmer " + i);
         }
 
         for (int i = 0; i < exportersThreads; i++){
             exporters[i] = new Threads(E, monitor);
-            exporters[i].setName("Trimmers " + i);
+            exporters[i].setName("Exporter " + i);
         }
 
         Log logger = new Log(creators, loadersLeft, loadersRight, adjustersLeft, adjustersRight, trimmers, exporters, monitor);

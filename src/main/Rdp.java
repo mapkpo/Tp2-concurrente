@@ -43,7 +43,8 @@ public class Rdp {
     private final double[] transitionMatrix = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     List<Integer> transitionSleepTime = Collections.unmodifiableList
-            (Arrays.asList(0, 0, 0, 100, 100, 0, 0, 100, 100, 100, 100, 0, 0, 100, 100, 0, 100));
+            (Arrays.asList(100 , 0 , 0 , 100, 100, 0,  0,  100, 100, 100, 100, 0,   0,    100, 100, 0, 100));
+            //                  t0   t1  t2   t3   t4   t5  t6  t7   t8   t9   t10  t11  t12   t13  t14 t15 t16
 
     private final long[] transitionTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
