@@ -96,6 +96,7 @@ public class Log implements Runnable {
                 writer.write("Imagenes ajustadas: "+ (monitor.getRdp().getFiredCounter()[9] + monitor.getRdp().getFiredCounter()[10]) +"\n");
                 writer.write("Imagenes recortadas: "+ (monitor.getRdp().getFiredCounter()[13] + monitor.getRdp().getFiredCounter()[14]) +"\n");
                 writer.write("Imagenes exportadas: "+ monitor.getRdp().getFiredCounter()[16] +"\n");
+                writer.write("Balance T11 y T12: "+ (monitor.getRdp().getFiredCounter()[11] + " , " +  monitor.getRdp().getFiredCounter()[12]) +"\n");
                 //writer.write(monitor.getBalanceCount() +"\n");
 
                 for (Threads thread: threadCreator){

@@ -5,7 +5,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         
-        int maxFiresForT0 = 1; // Límite máximo de disparos para la transición 0
+        int maxFiresForT0 = 200; // Límite máximo de disparos para la transición 0
         Policy policy = new Policy(true);   //true es equitativo, false es 8020
 
         int creatorThreads = 1;
