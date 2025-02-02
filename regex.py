@@ -28,10 +28,15 @@ while True:
     if not match:
         break
 
-    for i, (invariant_pattern, _) in enumerate(invariant_patterns):
-        invariant_counts[i] += len(re.findall(invariant_pattern, match[0]))
+    extracted_match = match[0]
+    print("Patrón extraído:", extracted_match)
 
-    print("Patrón extraído: " + match[0])
+    for i, (invariant_pattern, name) in enumerate(invariant_patterns):
+        if re.fullmatch(invariant_pattern, extracted_match):
+            invariant_counts[i] += 1
+            print(f"  - Coincide con: {name}")
+            break
+
     data = re.sub(pattern, replacement, data, count=1)
     total_count += 1
 
