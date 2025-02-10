@@ -16,33 +16,37 @@ public class Main {
         int trimmersThreads = 1;
         int exportersThreads = 1;
 
-        List<Integer> creator = new ArrayList();
+        List<Integer> creator = new ArrayList<>();
         creator.add(0);
-        List<Integer> LL = new ArrayList();
+        List<Integer> LL = new ArrayList<>();
         LL.add(1);
         LL.add(3);
-        List<Integer> LR = new ArrayList();
+        List<Integer> LR = new ArrayList<>();
         LR.add(2);
         LR.add(4);
-        List<Integer> AL = new ArrayList();
+        List<Integer> AL = new ArrayList<>();
         AL.add(5);
         AL.add(7);
         AL.add(9);
-        List<Integer> AR = new ArrayList();
+        List<Integer> AR = new ArrayList<>();
         AR.add(6);
         AR.add(8);
         AR.add(10);
-        List<Integer> T = new ArrayList();
-        T.add(11);
-        T.add(12);
-        T.add(13);
-        T.add(14);
-        List<Integer> E = new ArrayList();
+        List<Integer> TL = new ArrayList<>();
+        TL.add(11);
+        TL.add(13);
+        List<Integer> TR = new ArrayList<>();
+        TR.add(12);
+        TR.add(14);
+        List<List<Integer>> T = new ArrayList<List<Integer>>();
+        T.add(TL);
+        T.add(TR);
+        List<Integer> E = new ArrayList<>();
         E.add(15);
         E.add(16);
 
         Rdp rdp = new Rdp(maxFiresForT0);
-        Monitor monitor = new Monitor(rdp, policy);
+        Monitor monitor = new Monitor(rdp);
 
         Threads[] creators = new Threads[creatorThreads];
         Threads[] loadersLeft = new Threads[loaderThreadsLeft];
@@ -78,7 +82,7 @@ public class Main {
         }
 
         for (int i = 0; i < trimmersThreads; i++){
-            trimmers[i] = new Threads(T, monitor);
+            trimmers[i] = new Threads(T, monitor, policy);
             trimmers[i].setName("Trimmer " + i);
         }
 

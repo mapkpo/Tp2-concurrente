@@ -11,27 +11,27 @@ public class Policy {
     }
 
     private final Random rand = new Random();
-    public int decide(List<Integer> transitions){
+    public List<Integer> decide(List<List<Integer>> transitions){
         double probability = rand.nextDouble();
 
-        if (transitions.size() == 1){
-            return transitions.get(0);
+        switch (transitions.size()){
+            case 0:
+                return null;
+            case 1:
+                return transitions.get(0);
+            case 2:
+                if (policyTypeEquitative){
+                    if (probability <= 0.5){
+                        return transitions.get(0);
+                    } else return transitions.get(1);
+                } else {
+                    if (probability <= 0.8){
+                        return transitions.get(0);
+                    } else return transitions.get(1);
+                }
+            default:
+                int randomIndex = rand.nextInt(transitions.size());
+                return transitions.get(randomIndex);
         }
-
-        if (transitions.contains(11) && transitions.contains(12)){
-
-            if (policyTypeEquitative){
-                if (probability <= 0.5){
-                    return 11;
-                } else return 12;
-            } else {
-                if (probability <= 0.8){
-                    return 11;
-                } else return 12;
-            }
-        }
-
-        int randomIndex = rand.nextInt(transitions.size());
-        return transitions.get(randomIndex);
     }
 }

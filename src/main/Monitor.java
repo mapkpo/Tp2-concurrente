@@ -1,5 +1,7 @@
 package main;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -7,41 +9,28 @@ public class Monitor {
     private final Rdp rdp;
     private final ReentrantLock mutex;
     private boolean allInvariantsCompleted;
-    private Policy policy;
     private Semaphore[] transitionSems;
 
-    public Monitor(Rdp rdp, Policy policy) {
+    public Monitor(Rdp rdp) {
         this.rdp = rdp;
         this.mutex = new ReentrantLock();
         allInvariantsCompleted = false;
-        this.policy = policy;
         transitionSems = new Semaphore[rdp.transitionsNo];
         for (int i = 0; i < transitionSems.length; i++){
             transitionSems[i] = new Semaphore(1, true);
         }
     }
 
-    public Boolean fireTransition(List<Integer> transitions) {
-        int number = -1;
+    public Boolean fireTransition(Integer transition) {
         mutex.lock();
         finish(); 
         try {
-            List<Integer> toTry = rdp.whichEnabled();
-
-            toTry.retainAll(transitions);
-
-            if(toTry.isEmpty()){
-                return false;
-            }
-
-            number = policy.decide(toTry);
-
             // Verifico si el recurso esta disponible
-            if(!transitionSems[number].tryAcquire()){
+            if(!transitionSems[transition].tryAcquire()){
                 mutex.unlock();
                 // Sino ingreso a la cola
                 try {
-                    transitionSems[number].acquire();
+                    transitionSems[transition].acquire();
                 } catch (InterruptedException e) {
                     return false;
                 }
@@ -49,17 +38,17 @@ public class Monitor {
             }
 
 
-            if (rdp.isEnabled(number)) {
-                System.out.println("Firing transition: T" + number);
-                rdp.fire(number);
+            if (rdp.isEnabled(transition)) {
+                System.out.println("Firing transition: T" + transition);
+                rdp.fire(transition);
                 return true;
             } else {
-                System.out.println("Transition T" + number + " is not enabled.");
+                System.out.println("Transition T" + transition + " is not enabled.");
                 return false;
             }
         } finally {
-            if (number != -1) {
-                transitionSems[number].release();
+            if (transition != -1) {
+                transitionSems[transition].release();
             }
             mutex.unlock(); 
         }
