@@ -167,7 +167,7 @@ public class Rdp {
     }
 
     public Boolean completedInvariants(){
-        return firedCount[16] == maxInvariant;
+        return firedCount[16] >= maxInvariant;
     }
 
     public int[] getFiredCounter(){

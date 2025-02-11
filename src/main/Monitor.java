@@ -43,8 +43,8 @@ public class Monitor {
                     } else {
                         transitionLocks.get(transition).wait(timeLeft);
                     }
-                    mutex.lock();
                 }
+                mutex.lock();
                 timeLeft = rdp.isEnabled(transition);
             }
 
@@ -63,12 +63,15 @@ public class Monitor {
     }
 
     private void finish(){
+        if(allInvariantsCompleted)
+            return;
+
         if (rdp.completedInvariants()){
             allInvariantsCompleted = true;
             System.out.println(rdp.getSequence());
-            for (Object obj: transitionLocks.values()) {
-                synchronized (obj){
-                    obj.notifyAll();
+            for (int i = 0; i < transitionLocks.size(); i++) {
+                synchronized (transitionLocks.get(i)){
+                    transitionLocks.get(i).notifyAll();
                 }
             }
         }
