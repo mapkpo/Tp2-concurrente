@@ -65,10 +65,10 @@ public class Rdp {
     private RealVector marking = new ArrayRealVector(initialMarking);
     private final RealVector transition = new ArrayRealVector(transitionMatrix);
 
-    public boolean isEnabled(int a){
+    public long isEnabled(int a){
 
         if (a==0 && firedCount[0] >= maxInvariant){ //al llegar a los 200 disparos no permitir seguir disparando la T0.
-            return false;
+            return -1;
         }
 
         if(a>=0 && a< transition.getDimension()) {
@@ -78,23 +78,24 @@ public class Rdp {
             RealVector result = incidence.operate(adisparar).add(marking);
             for (int i = 0; i < result.getDimension(); i++) {
                 if (result.getEntry(i) < 0) {
-                    return false;
+                    return -1;
                 }
             }
 
             if (transitionTime[a] == -1)
                 transitionTime[a] = System.currentTimeMillis();
-            return (System.currentTimeMillis() - transitionTime[a] >= transitionSleepTime.get(a));
+
+            return Math.max(transitionTime[a] + transitionSleepTime.get(a) - System.currentTimeMillis(), 0);
         }
         System.out.println(a + "esta fuera de rango");
-        return false;
+        return -1;
     }
 
     public List<Integer> whichEnabled() {
         List<Integer> lista = new ArrayList<>();
 
         for (int i=0; i<17; i++){
-            if(isEnabled(i)){
+            if(isEnabled(i) == 0){
                 lista.add(i);
             }
         }
@@ -104,7 +105,7 @@ public class Rdp {
 
     public void fire(int a){
         testPlaceInvariant();
-        if(isEnabled(a)){
+        if(isEnabled(a) == 0){
             RealVector adisparar1 = transition.copy();
 
             adisparar1.setEntry(a, 1);

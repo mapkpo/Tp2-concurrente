@@ -38,7 +38,7 @@ public class Monitor {
             }
 
 
-            if (rdp.isEnabled(transition)) {
+            if (rdp.isEnabled(transition) == 0) {
                 System.out.println("Firing transition: T" + transition);
                 rdp.fire(transition);
                 return true;
