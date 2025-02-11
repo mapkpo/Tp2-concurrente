@@ -1,4 +1,5 @@
 package main;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -9,48 +10,55 @@ public class Monitor {
     private final Rdp rdp;
     private final ReentrantLock mutex;
     private boolean allInvariantsCompleted;
-    private Semaphore[] transitionSems;
+
+    private final Map<Integer, Object> transitionLocks = new HashMap<>();
 
     public Monitor(Rdp rdp) {
         this.rdp = rdp;
         this.mutex = new ReentrantLock();
         allInvariantsCompleted = false;
-        transitionSems = new Semaphore[rdp.transitionsNo];
-        for (int i = 0; i < transitionSems.length; i++){
-            transitionSems[i] = new Semaphore(1, true);
+
+        for (int i = 0; i < rdp.transitionsNo; i++){
+            transitionLocks.put(i, new Object());
         }
     }
 
     public Boolean fireTransition(Integer transition) {
         mutex.lock();
-        finish(); 
         try {
-            // Verifico si el recurso esta disponible
-            if(!transitionSems[transition].tryAcquire()){
-                mutex.unlock();
-                // Sino ingreso a la cola
-                try {
-                    transitionSems[transition].acquire();
-                } catch (InterruptedException e) {
-                    return false;
-                }
-                mutex.lock();
-            }
-
-
-            if (rdp.isEnabled(transition) == 0) {
-                System.out.println("Firing transition: T" + transition);
-                rdp.fire(transition);
-                return true;
-            } else {
-                System.out.println("Transition T" + transition + " is not enabled.");
+            finish();
+            if (allInvariantsCompleted){
                 return false;
             }
-        } finally {
-            if (transition != -1) {
-                transitionSems[transition].release();
+            long timeLeft = rdp.isEnabled(transition);
+
+            while (timeLeft != 0){
+                if (allInvariantsCompleted){
+                    return false;
+                }
+                synchronized (transitionLocks.get(transition)){
+                    mutex.unlock();
+                    if (timeLeft == -1) {
+                        transitionLocks.get(transition).wait(100); //TODO: Que se habilite con un notify
+                    } else {
+                        transitionLocks.get(transition).wait(timeLeft);
+                    }
+                    mutex.lock();
+                }
+                timeLeft = rdp.isEnabled(transition);
             }
-            mutex.unlock(); 
+
+            // Si la transición está sensibilizada la dispara y retorna
+            System.out.println("Firing transition: T" + transition);
+            rdp.fire(transition);
+            return true;
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (mutex.isHeldByCurrentThread()) {
+                mutex.unlock();
+            }
         }
     }
 
@@ -58,6 +66,11 @@ public class Monitor {
         if (rdp.completedInvariants()){
             allInvariantsCompleted = true;
             System.out.println(rdp.getSequence());
+            for (Object obj: transitionLocks.values()) {
+                synchronized (obj){
+                    obj.notifyAll();
+                }
+            }
         }
     }
 
