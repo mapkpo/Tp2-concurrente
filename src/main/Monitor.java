@@ -38,11 +38,7 @@ public class Monitor {
                 }
                 synchronized (transitionLocks.get(transition)){
                     mutex.unlock();
-                    if (timeLeft == -1) {
-                        transitionLocks.get(transition).wait(100); //TODO: Que se habilite con un notify
-                    } else {
-                        transitionLocks.get(transition).wait(timeLeft);
-                    }
+                    transitionLocks.get(transition).wait(Math.max(timeLeft, 0));
                 }
                 mutex.lock();
                 timeLeft = rdp.isEnabled(transition);
@@ -51,6 +47,16 @@ public class Monitor {
             // Si la transición está sensibilizada la dispara y retorna
             System.out.println("Firing transition: T" + transition);
             rdp.fire(transition);
+
+            // Notificar transiciones habilitadas
+            List<Integer> enabled = rdp.whichEnabled();
+            for (Integer t : enabled) {
+                synchronized (transitionLocks.get(t)) {
+                    transitionLocks.get(t).notify();
+                    System.out.println("despertando a los hilos de las transiciones: " + t);
+                }
+            }
+
             return true;
 
         } catch (InterruptedException e) {
