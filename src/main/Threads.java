@@ -39,12 +39,12 @@ public class Threads extends Thread {
                         return;
                     }
 
-                    try {
+                    /*try {
                         Threads.sleep(100); // Espera un poco antes de volver a intentar.
                     } catch (InterruptedException e) {
                         Threads.currentThread().interrupt();
                         break;
-                    }
+                    }*/
                 }
             }
 

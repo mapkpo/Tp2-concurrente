@@ -38,6 +38,7 @@ public class Monitor {
                 }
                 synchronized (transitionLocks.get(transition)){
                     mutex.unlock();
+                    System.out.println("Hilo esperará por: " + timeLeft);
                     transitionLocks.get(transition).wait(Math.max(timeLeft, 0));
                 }
                 mutex.lock();
