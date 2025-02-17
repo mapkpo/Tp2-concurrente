@@ -25,26 +25,16 @@ public class Threads extends Thread {
     @Override
     public void run() {
         while (true) {
-            /*if (monitor.areInvariantsCompleted()) {
-                System.out.println("Thread handling transitions " + transitions + " is terminating as invariants are completed.");
-                break;
-            }*/
+            
             List<Integer> selected = policy.decide(transitions);
 
             for (int transition : selected) {
                 while (!monitor.fireTransition(transition))
                 {
                     if (monitor.areInvariantsCompleted()) {
-                        System.out.println("Thread handling transitions " + transitions + " is terminating as invariants are completed.");
+                        System.out.println("Hilo manejando las transiciones " + transitions + " termina dado invariantes completadas.");
                         return;
                     }
-
-                    /*try {
-                        Threads.sleep(100); // Espera un poco antes de volver a intentar.
-                    } catch (InterruptedException e) {
-                        Threads.currentThread().interrupt();
-                        break;
-                    }*/
                 }
             }
 

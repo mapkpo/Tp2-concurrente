@@ -1,0 +1,35 @@
+@startuml
+actor User
+participant Main
+participant Rdp
+participant Monitor
+participant Threads
+participant Policy
+participant Log
+
+User -> Main: Execute program
+Main -> Rdp: Initialize
+Main -> Monitor: Initialize with Rdp
+Main -> Policy: Create (equitative=true)
+Main -> Threads: Create creator/loader/adjuster/etc. threads
+Main -> Log: Initialize with threads and Monitor
+
+Main -> Threads: Start all threads
+Main -> Log: Start logger thread
+
+loop Until invariants completed
+  Threads -> Policy: decide(transitions)
+  Policy --> Threads: Selected transitions
+  Threads -> Monitor: fireTransition(selected)
+  Monitor -> Rdp: isEnabled(transition)
+  Rdp --> Monitor: Time left (0 if enabled)
+  Monitor -> Rdp: fire(transition)
+  Rdp -> Rdp: Update marking and sequence
+  Monitor --> Threads: Success
+  Log -> Monitor: Periodically read state
+  Log -> Log: Write to file
+end
+
+Monitor -> Log: Notify completion
+Log -> Log: Write final sequence
+@enduml

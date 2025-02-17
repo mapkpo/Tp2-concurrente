@@ -2,8 +2,6 @@ package main;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
@@ -38,7 +36,14 @@ public class Monitor {
                 }
                 synchronized (transitionLocks.get(transition)){
                     mutex.unlock();
-                    System.out.println("Hilo esperará por: " + timeLeft);
+                    
+                        if(timeLeft>0){
+                            System.out.println("Hilo " + Thread.currentThread().getName() + " esperará por: " + timeLeft);
+                        } 
+                            else {
+                                System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
+                            }
+                    
                     transitionLocks.get(transition).wait(Math.max(timeLeft, 0));
                 }
                 mutex.lock();
@@ -46,7 +51,7 @@ public class Monitor {
             }
 
             // Si la transición está sensibilizada la dispara y retorna
-            System.out.println("Firing transition: T" + transition);
+            System.out.println("Disparando transición: T" + transition + " por " + Thread.currentThread().getName());
             rdp.fire(transition);
 
             // Notificar transiciones habilitadas
@@ -54,7 +59,7 @@ public class Monitor {
             for (Integer t : enabled) {
                 synchronized (transitionLocks.get(t)) {
                     transitionLocks.get(t).notify();
-                    System.out.println("despertando a los hilos de las transiciones: " + t);
+                    System.out.println("Despertando a los hilos de las transiciones: T" + t);
                 }
             }
 

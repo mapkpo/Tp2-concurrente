@@ -1,6 +1,4 @@
 @startuml
-
-' Main Class
 class Main {
     - int maxFiresForT0
     - Policy policy
@@ -30,29 +28,18 @@ class Main {
     + void main(String[] args)
 }
 
-' Monitor Class
 class Monitor {
-    - Rdp rdp
-    - ReentrantLock mutex
-    - boolean allInvariantsCompleted
-    - Policy policy
-    - Semaphore[] transitionSems
-    + Monitor(Rdp rdp, Policy policy)
-    + Boolean fireTransition(List<Integer> transitions)
-    - void finish()
-    + boolean areInvariantsCompleted()
-    + Rdp getRdp()
+  - rdp: Rdp
+  - mutex: ReentrantLock
+  - boolean allInvariantsCompleted
+  - transitionLocks: Map<Integer, Object>
+  + Monitor(Rdp rdp)
+  + fireTransition(Integer): Boolean
+  + finish()
+  + areInvariantsCompleted(): Boolean
+  + getRdp(): Rdp
 }
 
-' Policy Class
-class Policy {
-    - boolean policyTypeEquitative
-    - Random rand
-    + Policy(boolean a)
-    + int decide(List<Integer> transitions)
-}
-
-' Rdp Class
 class Rdp {
     - int transitionsNo
     - double[][] incidenceMatrix
@@ -79,17 +66,22 @@ class Rdp {
     + int[] getFiredCounter()
 }
 
-' Threads Class
-class Threads {
-    - List<Integer> transitions
-    - Monitor monitor
-    + Threads(List<Integer> transitions, Monitor monitor)
-    + void run()
+class Policy {
+  - policyTypeEquitative: boolean
+  - rand: Random
+  + Policy(boolean a)
+  + decide(List<List<Integer>>): List<Integer>
 }
 
-' Log Class
+class Threads {
+  - transitions: List<List<Integer>>
+  - monitor: Monitor
+  - policy: Policy
+  + run()
+}
+
 class Log {
-    - int count
+- int count
     - Threads[] threadCreator
     - Threads[] threadLeftLoader
     - Threads[] threadRightLoader
@@ -108,15 +100,15 @@ class Log {
     - void writeSequenceOnly()
 }
 
-' Relationships
-Main --> Monitor
-Main --> Policy
-Main --> Rdp
-Main --> Threads
-Monitor --> Rdp
-Monitor --> Policy
-Threads --> Monitor
-Log --> Monitor
-Log --> Threads
+Main --> Monitor : creates
+Main --> Rdp : creates
+Main --> Policy : creates
+Main --> Threads : creates
+Main --> Log : creates
 
+Monitor --> Rdp : uses
+Threads --> Monitor : uses
+Threads --> Policy : uses
+Log --> Monitor : uses
+Log --> Threads : reads state
 @enduml
