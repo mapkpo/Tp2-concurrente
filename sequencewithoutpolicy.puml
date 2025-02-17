@@ -1,0 +1,82 @@
+@startuml
+title Petri Net System Sequence Diagram
+
+participant Main
+participant Creator
+participant LoaderLeft
+participant LoaderRight
+participant AdjusterLeft
+participant AdjusterRight
+participant Trimmer
+participant Exporter
+participant Monitor
+participant Rdp
+participant Log
+
+group Initialization
+Main -> Monitor: new(rdp)
+Main -> Rdp: new(maxFires)
+Main -> Creator: start()
+Main -> LoaderLeft: start()
+Main -> LoaderRight: start()
+Main -> AdjusterLeft: start()
+Main -> AdjusterRight: start()
+Main -> Trimmer: start()
+Main -> Exporter: start()
+Main -> Log: start()
+end
+
+group Thread Operation
+loop while invariants not completed
+Creator -> Monitor: fireTransition(T0)
+activate Monitor
+Monitor -> Rdp: isEnabled(T0)
+activate Rdp
+
+alt not enabled
+Rdp --> Monitor: timeLeft > 0
+Monitor -> Creator: **wait** (timeLeft)
+deactivate Rdp
+deactivate Monitor
+else enabled
+Rdp --> Monitor: 0
+Monitor -> Rdp: fire(T0)
+activate Rdp
+Rdp -> Rdp: updateMarking()
+Rdp -> Rdp: testInvariants()
+Monitor <-- Rdp: 
+deactivate Rdp
+Monitor --> Creator: return true
+deactivate Monitor
+
+Monitor -> LoaderLeft: **notify**
+Monitor -> LoaderRight: **notify**
+'... (other notifications)
+end
+end
+end
+
+group Logging
+loop every 500ms
+Log -> Monitor: getRdpState()
+activate Monitor
+Monitor -> Rdp: getFiredCounters()
+Monitor -> Rdp: getSequence()
+Monitor --> Log: data
+deactivate Monitor
+Log -> Log: writeFile()
+end
+end
+
+group Termination
+Monitor -> Monitor: checkCompletion()
+alt invariants completed
+Monitor -> Creator: **notifyAll**
+Monitor -> LoaderLeft: **notifyAll**
+Monitor -> LoaderRight: **notifyAll**
+'... (other threads)
+Monitor -> Log: completion signal
+Log -> Log: writeFinalLog()
+end
+end
+@enduml
