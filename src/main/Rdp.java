@@ -54,6 +54,8 @@ public class Rdp {
 
     private int maxInvariant;
 
+    private int lastFired;
+
     public Rdp(int max) {
         //-1 significa que la transicion no esta sensibilizada por lo que el tiempo aun no corre.
         Arrays.fill(transitionTime, -1);
@@ -103,6 +105,113 @@ public class Rdp {
         return lista;
     }
 
+    public List<Integer> whichEnabledAfterLastFired() {
+        List<Integer> lista = new ArrayList<>();
+
+        switch (lastFired) {
+            case 0:
+                if (isEnabled(1)==0){
+                    lista.add(1);
+                }
+                if (isEnabled(2)==0){
+                    lista.add(2);
+                }
+                break;
+            case 1:
+                if (isEnabled(3)==0){
+                    lista.add(3);
+                }
+                break;
+            case 2:
+                if (isEnabled(4)==0){
+                    lista.add(4);
+                }
+                break;
+            case 3:
+                if (isEnabled(5)==0){
+                    lista.add(5);
+                }
+                if (isEnabled(6)==0){
+                    lista.add(6);
+                }
+                break;
+            case 4:
+                if (isEnabled(5)==0){
+                    lista.add(5);
+                }
+                if (isEnabled(6)==0){
+                    lista.add(6);
+                }
+                break;
+            case 5:
+                if (isEnabled(7)==0){
+                    lista.add(7);
+                }
+                break;
+            case 6:
+                if (isEnabled(8)==0){
+                    lista.add(8);
+                }
+                break;
+            case 7:
+                if (isEnabled(9)==0){
+                    lista.add(9);
+                }
+                break;
+            case 8:
+                if (isEnabled(10)==0){
+                    lista.add(10);
+                }
+                break;
+            case 9:
+                if (isEnabled(11)==0){
+                    lista.add(11);
+                }
+                if (isEnabled(12)==0){
+                    lista.add(12);
+                }
+                break;
+            case 10:
+                if (isEnabled(11)==0){
+                    lista.add(11);
+                }
+                if (isEnabled(12)==0){
+                    lista.add(12);
+                }
+                break;
+            case 11:
+                if (isEnabled(13)==0){
+                    lista.add(13);
+                }
+                break;
+            case 12:
+                if (isEnabled(14)==0){
+                    lista.add(14);
+                }
+                break;
+            case 13:
+                if (isEnabled(15)==0){
+                    lista.add(15);
+                }
+                break;
+            case 14:
+                if (isEnabled(15)==0){
+                    lista.add(15);
+                }
+                break;
+            case 15:
+                if (isEnabled(16)==0){
+                    lista.add(16);
+                }
+                break;
+
+            default:
+                lista.add(0);
+                break;
+        }
+        return lista;
+    }
+
     public void fire(int a){
         testPlaceInvariant();
         if(isEnabled(a) == 0){
@@ -125,6 +234,8 @@ public class Rdp {
             }
 
             firedCount[a]++;
+
+            lastFired = a;
         }
     }
 

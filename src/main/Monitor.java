@@ -8,13 +8,15 @@ public class Monitor {
     private final Rdp rdp;
     private final ReentrantLock mutex;
     private boolean allInvariantsCompleted;
+    private Policy policy;
 
     private final Map<Integer, Object> transitionLocks = new HashMap<>();
 
-    public Monitor(Rdp rdp) {
+    public Monitor(Rdp rdp, Policy policy) {
         this.rdp = rdp;
         this.mutex = new ReentrantLock();
         allInvariantsCompleted = false;
+        this.policy = policy;
 
         for (int i = 0; i < rdp.transitionsNo; i++){
             transitionLocks.put(i, new Object());
