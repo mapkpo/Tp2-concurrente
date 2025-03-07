@@ -11,14 +11,15 @@ public class Monitor {
     private final Semaphore mutex;
     private boolean allInvariantsCompleted;
 
+    private final Policy policy;
     private final Map<Integer, Object> transitionLocks = new HashMap<>();
-
     private final List<Boolean> timedQueued = new ArrayList<>();
     private final List<Integer> threadsOnQueue = new ArrayList<>();
 
-    public Monitor(Rdp rdp) {
+    public Monitor(Rdp rdp, Policy policy) {
         this.rdp = rdp;
         this.mutex = new Semaphore(1);
+        this.policy = policy;
         allInvariantsCompleted = false;
 
         for (int i = 0; i < rdp.transitionsNo; i++){

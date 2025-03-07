@@ -50,7 +50,7 @@ public class Main {
         exporterTransitions.add(16);
 
         Rdp rdp = new Rdp(maxFiresForT0);
-        Monitor monitor = new Monitor(rdp);
+        Monitor monitor = new Monitor(rdp, policy);
 
         Threads[] creators = new Threads[creatorThreads];
         Threads[] loadersLeft = new Threads[loaderThreadsLeft];
