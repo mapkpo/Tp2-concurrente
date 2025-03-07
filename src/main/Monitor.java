@@ -44,25 +44,36 @@ public class Monitor {
                     break;
                 }
 
-
-
                 // COLAS DE CONDICIÓN
                 synchronized (transitionLocks.get(transition)){
-                    // TODO: Si la transición no está sensibilizada por tiempo no marcar que hay un hilo en cola,
-                    //  marcar que hay uno por tiempo y solo libera el mutex duerme por el tiempo que hace falta y lo vuelve a adquirir.
-                    // Informo que hay un hilo más en la cola de condición
-                    threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
-                    System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
+                    if (timeLeft == -1 || timedQueued.get(transition)) {
+                        // Informo que hay un hilo más en la cola de condición
+                        threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
+                        System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
 
-                    // Si no está sensibilizada y tengo en mutex lo libero
-                    if (mutex.availablePermits() == 0) {
-                        mutex.release();
+                        // Si no está sensibilizada y tengo en mutex lo libero
+                        if (mutex.availablePermits() == 0) {
+                            mutex.release();
+                        }
+
+                        transitionLocks.get(transition).wait();
+
+                        // Al despertar informo que hay un hilo menos en la cola de condición
+                        threadsOnQueue.set(transition, threadsOnQueue.get(transition) - 1);
+                    } else {
+                        // Informo que hay un hilo esperando a que se sensibilice la transición por tiempo
+                        timedQueued.set(transition, true);
+                        // Libero el mutex
+                        if (mutex.availablePermits() == 0) {
+                            mutex.release();
+                        }
+                        // Duermo el tiempo que hace falta
+                        transitionLocks.get(transition).wait(timeLeft);
+                        // Adquiero el mutex
+                        mutex.acquire();
+                        // Informo que ya no hay un hilo esperando
+                        timedQueued.set(transition, false);
                     }
-
-                    transitionLocks.get(transition).wait();
-
-                    // Al despertar informo que hay un hilo menos en la cola de condición
-                    threadsOnQueue.set(transition, threadsOnQueue.get(transition) - 1);
                 }
             }
 
