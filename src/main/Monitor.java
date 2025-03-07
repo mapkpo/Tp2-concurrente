@@ -2,18 +2,19 @@ package main;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
     private final Rdp rdp;
-    private final ReentrantLock mutex;
+    private final Semaphore mutex;
     private boolean allInvariantsCompleted;
 
     private final Map<Integer, Object> transitionLocks = new HashMap<>();
 
     public Monitor(Rdp rdp) {
         this.rdp = rdp;
-        this.mutex = new ReentrantLock();
+        this.mutex = new Semaphore(1);
         allInvariantsCompleted = false;
 
         for (int i = 0; i < rdp.transitionsNo; i++){
@@ -22,8 +23,8 @@ public class Monitor {
     }
 
     public Boolean fireTransition(Integer transition) {
-        mutex.lock();
         try {
+            mutex.acquire();
             finish();
             if (allInvariantsCompleted){
                 return false;
@@ -35,18 +36,18 @@ public class Monitor {
                     return false;
                 }
                 synchronized (transitionLocks.get(transition)){
-                    mutex.unlock();
+                    mutex.release();
                     
                         if(timeLeft>0){
                             System.out.println("Hilo " + Thread.currentThread().getName() + " esperará por: " + timeLeft);
                         } 
-                            else {
-                                System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
-                            }
+                        else {
+                            System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
+                        }
                     
                     transitionLocks.get(transition).wait(Math.max(timeLeft, 0));
                 }
-                mutex.lock();
+                mutex.acquire();
                 timeLeft = rdp.isEnabled(transition);
             }
 
@@ -68,8 +69,8 @@ public class Monitor {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-            if (mutex.isHeldByCurrentThread()) {
-                mutex.unlock();
+            if (mutex.availablePermits() == 0) {
+                mutex.release();
             }
         }
     }
