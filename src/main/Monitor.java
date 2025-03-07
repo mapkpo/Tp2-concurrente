@@ -1,4 +1,5 @@
 package main;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,9 @@ public class Monitor {
     private boolean allInvariantsCompleted;
 
     private final Map<Integer, Object> transitionLocks = new HashMap<>();
+
+    private final List<Boolean> timedQueued = new ArrayList<>();
+    private final List<Integer> threadsOnQueue = new ArrayList<>();
 
     public Monitor(Rdp rdp) {
         this.rdp = rdp;
@@ -29,49 +33,57 @@ public class Monitor {
             if (allInvariantsCompleted){
                 return false;
             }
-            long timeLeft = rdp.isEnabled(transition);
 
-            while (timeLeft != 0){
-                if (allInvariantsCompleted){
-                    return false;
+            while (true) {
+                long timeLeft = rdp.isEnabled(transition);
+
+                // Si está sensibilizada la disparo
+                if (timeLeft == 0){
+                    System.out.println("Disparando transición: T" + transition + " por " + Thread.currentThread().getName());
+                    rdp.fire(transition);
+                    break;
                 }
+
+
+
+                // COLAS DE CONDICIÓN
                 synchronized (transitionLocks.get(transition)){
-                    mutex.release();
-                    
-                        if(timeLeft>0){
-                            System.out.println("Hilo " + Thread.currentThread().getName() + " esperará por: " + timeLeft);
-                        } 
-                        else {
-                            System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
-                        }
-                    
-                    transitionLocks.get(transition).wait(Math.max(timeLeft, 0));
-                }
-                mutex.acquire();
-                timeLeft = rdp.isEnabled(transition);
-            }
+                    // TODO: Si la transición no está sensibilizada por tiempo no marcar que hay un hilo en cola,
+                    //  marcar que hay uno por tiempo y solo libera el mutex duerme por el tiempo que hace falta y lo vuelve a adquirir.
+                    // Informo que hay un hilo más en la cola de condición
+                    threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
+                    System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
 
-            // Si la transición está sensibilizada la dispara y retorna
-            System.out.println("Disparando transición: T" + transition + " por " + Thread.currentThread().getName());
-            rdp.fire(transition);
+                    // Si no está sensibilizada y tengo en mutex lo libero
+                    if (mutex.availablePermits() == 0) {
+                        mutex.release();
+                    }
+
+                    transitionLocks.get(transition).wait();
+
+                    // Al despertar informo que hay un hilo menos en la cola de condición
+                    threadsOnQueue.set(transition, threadsOnQueue.get(transition) - 1);
+                }
+            }
 
             // Notificar transiciones habilitadas
-            List<Integer> enabled = rdp.whichEnabled();
-            for (Integer t : enabled) {
-                synchronized (transitionLocks.get(t)) {
-                    transitionLocks.get(t).notify();
-                    System.out.println("Despertando a los hilos de las transiciones: T" + t);
-                }
+            List<Integer> enabled = rdp.whichEnabledAfterLastFired();
+            List<Integer> ready = new ArrayList<>();
+            for (Integer T : enabled) {
+                if (threadsOnQueue.get(T) > 0)
+                    ready.add(T);
             }
-
+            // Si no hay hilos que despertar liberar el mutex y retornar
+            if (ready.isEmpty()){
+                mutex.release();
+                return true;
+            }
+            // TODO: Pedir a la política que elija entre las que están en ready y despertar SOLO UNO
+            // No liberamos el mutex después de despertar un hilo
             return true;
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        } finally {
-            if (mutex.availablePermits() == 0) {
-                mutex.release();
-            }
         }
     }
 
