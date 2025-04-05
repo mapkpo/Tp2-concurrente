@@ -33,11 +33,14 @@ public class Monitor {
         try {
             mutex.acquire();
             finish();
-            if (allInvariantsCompleted){
-                return false;
-            }
 
             while (true) {
+                // Verificamos si ya se completaron los invariantes después de despertar
+                if (allInvariantsCompleted) {
+                    mutex.release();
+                    return false;
+                }
+
                 long timeLeft = rdp.isEnabled(transition);
 
                 // Si está sensibilizada la disparo
@@ -72,14 +75,13 @@ public class Monitor {
                         }
                         // Duermo el tiempo que hace falta
                         transitionLocks.get(transition).wait(timeLeft);
+                        if (allInvariantsCompleted){
+                            return false;
+                        }
                         // Adquiero el mutex
                         mutex.acquire();
                         // Informo que ya no hay un hilo esperando
                         timedQueued.set(transition, false);
-                    }
-                    // Verificamos si ya se completaron los invariantes después de despertar
-                    if (allInvariantsCompleted) {
-                        return false;
                     }
                 }
             }
@@ -102,7 +104,11 @@ public class Monitor {
                     transitionLocks.get(to_awake).notify();
                 }
             }
-            // No liberamos el mutex después de despertar un hilo
+            // No liberamos el mutex después de despertar un hilo a menos que ya se hayan completado todos los invariantes
+            if (allInvariantsCompleted) {
+                mutex.release();
+                return false;
+            }
             return true;
 
         } catch (InterruptedException e) {
