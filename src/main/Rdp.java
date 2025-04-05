@@ -127,15 +127,7 @@ public class Rdp {
                     lista.add(4);
                 }
                 break;
-            case 3:
-                if (isEnabled(5)==0){
-                    lista.add(5);
-                }
-                if (isEnabled(6)==0){
-                    lista.add(6);
-                }
-                break;
-            case 4:
+            case 3, 4:
                 if (isEnabled(5)==0){
                     lista.add(5);
                 }
@@ -163,15 +155,7 @@ public class Rdp {
                     lista.add(10);
                 }
                 break;
-            case 9:
-                if (isEnabled(11)==0){
-                    lista.add(11);
-                }
-                if (isEnabled(12)==0){
-                    lista.add(12);
-                }
-                break;
-            case 10:
+            case 9, 10:
                 if (isEnabled(11)==0){
                     lista.add(11);
                 }
@@ -189,12 +173,7 @@ public class Rdp {
                     lista.add(14);
                 }
                 break;
-            case 13:
-                if (isEnabled(15)==0){
-                    lista.add(15);
-                }
-                break;
-            case 14:
+            case 13, 14:
                 if (isEnabled(15)==0){
                     lista.add(15);
                 }
@@ -224,7 +203,7 @@ public class Rdp {
 
             transitionTime[a] = -1;
 
-            //sin hacer esto el programa de python para comprobar la expresion regular aveces (20% del tiempo) falla ya que se come una T0 y lo deja como 0 solo, entonces
+            //sin hacer esto el programa de python para comprobar la expresión regular aveces (20% del tiempo) falla ya que se come una T0 y lo deja como 0 solo, entonces
             //interpreta un invariante menos debido a ese error, haciendo que sea T00 se soluciona y funciona siempre
             if(a<10){
                 sequence += "T0" + a;

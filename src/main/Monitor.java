@@ -24,6 +24,8 @@ public class Monitor {
 
         for (int i = 0; i < rdp.transitionsNo; i++){
             transitionLocks.put(i, new Object());
+            timedQueued.add(false);
+            threadsOnQueue.add(0);
         }
     }
 
@@ -75,6 +77,10 @@ public class Monitor {
                         // Informo que ya no hay un hilo esperando
                         timedQueued.set(transition, false);
                     }
+                    // Verificamos si ya se completaron los invariantes después de despertar
+                    if (allInvariantsCompleted) {
+                        return false;
+                    }
                 }
             }
 
@@ -89,6 +95,12 @@ public class Monitor {
             if (ready.isEmpty()){
                 mutex.release();
                 return true;
+            }
+            else {
+                Integer to_awake = policy.decide(ready);
+                synchronized (transitionLocks.get(to_awake)) {
+                    transitionLocks.get(to_awake).notify();
+                }
             }
             // TODO: Pedir a la política que elija entre las que están en ready y despertar SOLO UNO
             // No liberamos el mutex después de despertar un hilo

@@ -11,7 +11,7 @@ public class Policy {
     }
 
     private final Random rand = new Random();
-    public List<Integer> decide(List<List<Integer>> transitions){
+    public Integer decide(List<Integer> transitions){
         double probability = rand.nextDouble();
 
         switch (transitions.size()){
