@@ -199,7 +199,7 @@ public class Rdp {
             adisparar1.setEntry(a, 1);
 
             RealVector nuevomarcado = incidence.operate(adisparar1).add(marking);
-            updateMarking(nuevomarcado);
+            marking = nuevomarcado;
 
             transitionTime[a] = -1;
 
@@ -216,10 +216,6 @@ public class Rdp {
 
             lastFired = a;
         }
-    }
-
-    private void updateMarking(RealVector a){
-        marking = a;
     }
 
     public void printMarking(){
