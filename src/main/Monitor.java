@@ -102,7 +102,6 @@ public class Monitor {
                     transitionLocks.get(to_awake).notify();
                 }
             }
-            // TODO: Pedir a la política que elija entre las que están en ready y despertar SOLO UNO
             // No liberamos el mutex después de despertar un hilo
             return true;
 
