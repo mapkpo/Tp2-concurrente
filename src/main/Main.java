@@ -5,16 +5,17 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         
-        int maxFiresForT0 = 16; // Límite máximo de disparos para la transición 0
+        int maxFiresForT0 = 10; // Límite máximo de disparos para la transición 0
         Policy policy = new Policy(true);   //true es equitativo, false es 8020
 
-        int creatorThreads = 1;
-        int loaderThreadsLeft = 1;
-        int loaderThreadsRight = 1;
-        int adjustersThreadsLeft = 1;
-        int adjustersThreadsRight = 1;
-        int trimmersThreads = 1;
-        int exportersThreads = 1;
+        int creatorThreads = 5;
+        int loaderThreadsLeft = 5;
+        int loaderThreadsRight = 5;
+        int adjustersThreadsLeft = 5;
+        int adjustersThreadsRight = 5;
+        int trimmersThreadsLeft = 5;
+        int trimmersThreadsRight = 5;
+        int exportersThreads = 5;
 
         List<Integer> creatorTransitions = new ArrayList<>();
         creatorTransitions.add(0);
@@ -57,7 +58,8 @@ public class Main {
         Threads[] loadersRight = new Threads[loaderThreadsRight];
         Threads[] adjustersLeft = new Threads[adjustersThreadsLeft];
         Threads[] adjustersRight = new Threads[adjustersThreadsRight];
-        Threads[] trimmers = new Threads[trimmersThreads];
+        Threads[] trimmersLeft = new Threads[trimmersThreadsRight];
+        Threads[] trimmersRight = new Threads[trimmersThreadsRight];
         Threads[] exporters = new Threads[exportersThreads];
 
         for (int i = 0; i < creatorThreads; i++){
@@ -85,14 +87,14 @@ public class Main {
             adjustersRight[i].setName("Adjuster right " + i);
         }
 
-        for (int i = 0; i < trimmersThreads; i++){
-            trimmers[i] = new Threads(leftTrimmerTransitions, monitor);
-            trimmers[i].setName("Trimmer left" + i);
+        for (int i = 0; i < trimmersThreadsLeft; i++){
+            trimmersLeft[i] = new Threads(leftTrimmerTransitions, monitor);
+            trimmersLeft[i].setName("Trimmer left" + i);
         }
 
-        for (int i = 0; i < trimmersThreads; i++){
-            trimmers[i] = new Threads(rightTrimmerTransitions, monitor);
-            trimmers[i].setName("Trimmer right" + i);
+        for (int i = 0; i < trimmersThreadsRight; i++){
+            trimmersRight[i] = new Threads(rightTrimmerTransitions, monitor);
+            trimmersRight[i].setName("Trimmer right" + i);
         }
 
         for (int i = 0; i < exportersThreads; i++){
@@ -100,7 +102,7 @@ public class Main {
             exporters[i].setName("Exporter " + i);
         }
 
-        Log logger = new Log(creators, loadersLeft, loadersRight, adjustersLeft, adjustersRight, trimmers, exporters, monitor);
+        Log logger = new Log(creators, loadersLeft, loadersRight, adjustersLeft, adjustersRight, trimmersRight, exporters, monitor);
         new Thread(logger).start();
 
         for (int i = 0; i < creatorThreads; i++){
@@ -123,8 +125,12 @@ public class Main {
             adjustersRight[i].start();
         }
 
-        for (int i = 0; i < trimmersThreads; i++){
-            trimmers[i].start();
+        for (int i = 0; i < trimmersThreadsLeft; i++){
+            trimmersLeft[i].start();
+        }
+
+        for (int i = 0; i < trimmersThreadsRight; i++){
+            trimmersRight[i].start();
         }
 
         for (int i = 0; i < exportersThreads; i++){
