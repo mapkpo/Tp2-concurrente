@@ -1,114 +1,97 @@
 @startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' ======== CLASES PRINCIPALES ========
 class Main {
-    - int maxFiresForT0
-    - Policy policy
-    - int creatorThreads
-    - int loaderThreadsLeft
-    - int loaderThreadsRight
-    - int adjustersThreadsLeft
-    - int adjustersThreadsRight
-    - int trimmersThreads
-    - int exportersThreads
-    - List<Integer> creator
-    - List<Integer> LL
-    - List<Integer> LR
-    - List<Integer> AL
-    - List<Integer> AR
-    - List<Integer> T
-    - List<Integer> E
-    - Rdp rdp
-    - Monitor monitor
-    - Threads[] creators
-    - Threads[] loadersLeft
-    - Threads[] loadersRight
-    - Threads[] adjustersLeft
-    - Threads[] adjustersRight
-    - Threads[] trimmers
-    - Threads[] exporters
-    + void main(String[] args)
+    +main(String[] args)
 }
 
 class Monitor {
-  - rdp: Rdp
-  - mutex: ReentrantLock
-  - boolean allInvariantsCompleted
-  - transitionLocks: Map<Integer, Object>
-  + Monitor(Rdp rdp)
-  + fireTransition(Integer): Boolean
-  + finish()
-  + areInvariantsCompleted(): Boolean
-  + getRdp(): Rdp
-}
-
-class Rdp {
-    - int transitionsNo
-    - double[][] incidenceMatrix
-    - double[] initialMarking
-    - double[] transitionMatrix
-    - List<Integer> transitionSleepTime
-    - long[] transitionTime
-    - int[] firedCount
-    - String sequence
-    - int maxInvariant
-    - RealMatrix incidence
-    - RealVector marking
-    - RealVector transition
-    + Rdp(int max)
-    + boolean isEnabled(int a)
-    + List<Integer> whichEnabled()
-    + void fire(int a)
-    - void updateMarking(RealVector a)
-    + void printMarking()
-    + int getMarking(int place)
-    - void testPlaceInvariant()
-    + String getSequence()
-    + Boolean completedInvariants()
-    + int[] getFiredCounter()
+    -Rdp rdp
+    -Semaphore mutex
+    -boolean allInvariantsCompleted
+    -Policy policy
+    -Map<Integer, Object> transitionLocks
+    -List<Boolean> timedQueued
+    -List<Integer> threadsOnQueue
+    +fireTransition(Integer): Boolean
+    +areInvariantsCompleted(): boolean
+    +getRdp(): Rdp
+    -finish(): void
+    -ContitionQueue(Integer): void
+    -TimedQueue(Integer, long): void
 }
 
 class Policy {
-  - policyTypeEquitative: boolean
-  - rand: Random
-  + Policy(boolean a)
-  + decide(List<List<Integer>>): List<Integer>
+    -boolean policyTypeEquitative
+    -Random rand
+    +Policy(boolean)
+    +decide(List<Integer>): Integer
 }
 
 class Threads {
-  - transitions: List<List<Integer>>
-  - monitor: Monitor
-  - policy: Policy
-  + run()
+    -List<Integer> transitions
+    -Monitor monitor
+    +Threads(List<Integer>, Monitor)
+    +run()
 }
 
 class Log {
-- int count
-    - Threads[] threadCreator
-    - Threads[] threadLeftLoader
-    - Threads[] threadRightLoader
-    - Threads[] threadLeftAdjusters
-    - Threads[] threadRightAdjusters
-    - Threads[] threadTrimmers
-    - Threads[] threadExporters
-    - Monitor monitor
-    - File file
-    - File file1
-    - Long INITIAL_TIME
-    + Log(Threads[] threadCreator, Threads[] threadLeftLoader, Threads[] threadRightLoader, Threads[] threadLeftAdjusters, Threads[] threadRightAdjusters, Threads[] threadTrimmers, Threads[] threadExporters, Monitor monitor)
-    + void run()
-    - void writeFile()
-    - void logWriteSequence()
-    - void writeSequenceOnly()
+    -int count
+    -Threads[] threadCreator
+    -Threads[] threadLeftLoader
+    -Threads[] threadRightLoader
+    -Threads[] threadLeftAdjusters
+    -Threads[] threadRightAdjusters
+    -Threads[] threadLeftTrimmers
+    -Threads[] threadRightTrimmers
+    -Threads[] threadExporters
+    -Monitor monitor
+    -File file
+    -File file1
+    +run()
+    -writeFile(): void
+    -logWriteSequence(): void
+    -writeSequenceOnly(): void
 }
 
-Main --> Monitor : creates
-Main --> Rdp : creates
-Main --> Policy : creates
-Main --> Threads : creates
-Main --> Log : creates
+class Rdp {
+    +int transitionsNo
+    -double[][] incidenceMatrix
+    -double[] initialMarking
+    -double[] transitionMatrix
+    -List<Integer> transitionSleepTime
+    -long[] transitionTime
+    -int[] firedCount
+    -String sequence
+    -int maxInvariant
+    -int lastFired
+    +Rdp(int)
+    +isEnabled(int): long
+    +whichEnabled(): List<Integer>
+    +whichEnabledAfterLastFired(): List<Integer>
+    +fire(int)
+    +getSequence(): String
+    +getFiredCounter(): int[]
+    +completedInvariants(): Boolean
+    +getMarking(int): int
+    -testPlaceInvariant(): void
+    -printMarking(): void
+}
 
-Monitor --> Rdp : uses
-Threads --> Monitor : uses
-Threads --> Policy : uses
-Log --> Monitor : uses
-Log --> Threads : reads state
+' ======== RELACIONES ENTRE CLASES ========
+Main --> Monitor : crea
+Main --> Policy : crea
+Main --> Rdp : crea
+Main --> Threads : instancia
+Main --> Log : crea
+
+Monitor *-- Rdp
+Monitor *-- Policy
+Monitor o-- Threads
+
+Threads --> Monitor
+Log *-- Threads : contiene multiples
+Log *-- Monitor
 @enduml

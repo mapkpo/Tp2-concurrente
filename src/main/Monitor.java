@@ -28,7 +28,7 @@ public class Monitor {
     }
 
     // COLAS DE CONDICIÓN
-    private void ContitionQueue(Integer transition) throws InterruptedException {
+    private void ConditionQueue(Integer transition) throws InterruptedException {
         synchronized (transitionLocks.get(transition)) {
             // Informo que hay un hilo más en la cola de condición
             threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
@@ -85,7 +85,7 @@ public class Monitor {
 
                 // Si hay un hilo durmiendo por tiempo tiene prioridad, voy directo a la cola de condición
                 if (timedQueued.get(transition)){
-                    ContitionQueue(transition);
+                    ConditionQueue(transition);
                 }
 
                 long timeLeft = rdp.isEnabled(transition);
@@ -99,7 +99,7 @@ public class Monitor {
 
                 if (timeLeft == -1) {
                     // Si no está sensibilizada por marcado entro a la cola de condición
-                    ContitionQueue(transition);
+                    ConditionQueue(transition);
                 } else {
                     // Si no está sensibilizada por tiempo entro a la cola temporizada
                     TimedQueue(transition, timeLeft);

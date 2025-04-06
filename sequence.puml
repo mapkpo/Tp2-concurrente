@@ -1,0 +1,49 @@
+@startuml
+' Diagrama de secuencia detallado de un hilo disparando una transición
+skinparam sequenceMessageAlign center
+skinparam ParticipantPadding 30
+skinparam maxMessageSize 120
+
+actor "Thread (Threads)" as Thread
+participant "Monitor" as Monitor
+participant "Rdp" as Rdp
+participant "Policy" as Policy
+
+== Intento de disparar una transición ==
+Thread -> Monitor : fireTransition(transition)
+Monitor -> Monitor : mutex.acquire()
+Monitor -> Monitor : finish()
+
+alt Invariantes completados
+    Monitor -> Monitor : mutex.release()
+    Monitor --> Thread : return false
+else Aún no finaliza
+    alt Hay hilo en cola temporizada
+        Monitor -> Monitor : ConditionQueue(transition)
+    end
+
+    Monitor -> Rdp : isEnabled(transition)
+    alt timeLeft == 0
+        Monitor -> Rdp : fire(transition)
+        Rdp -> Rdp : actualizar marcado, secuencia, contadores
+    else timeLeft == -1
+        Monitor -> Monitor : ConditionQueue(transition)
+    else tiempo restante > 0
+        Monitor -> Monitor : TimedQueue(transition, timeLeft)
+    end
+
+    Monitor -> Rdp : whichEnabledAfterLastFired()
+    alt hay hilos en cola de condición
+        Monitor -> Policy : decide(readyTransitions)
+        Policy --> Monitor : transitionId
+        Monitor -> Thread : notify() a lock[transitionId]
+    end
+
+    alt Invariantes completados
+        Monitor -> Monitor : mutex.release()
+        Monitor --> Thread : return false
+    else
+        Monitor --> Thread : return true
+    end
+end
+@enduml
