@@ -27,6 +27,50 @@ public class Monitor {
         }
     }
 
+    // COLAS DE CONDICIÓN
+    private void ContitionQueue(Integer transition) throws InterruptedException {
+        synchronized (transitionLocks.get(transition)) {
+            // Informo que hay un hilo más en la cola de condición
+            threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
+            System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
+
+            // Si tengo el mutex lo libero
+            if (mutex.availablePermits() == 0) {
+                mutex.release();
+            }
+
+            // Espero
+            transitionLocks.get(transition).wait();
+
+            // No hace falta tomar el mutex nuevamente ya que quien despertó el hilo no lo liberó
+
+            // Al despertar informo que hay un hilo menos en la cola de condición
+            threadsOnQueue.set(transition, threadsOnQueue.get(transition) - 1);
+        }
+    }
+
+    // COLA DE CONDICIÓN POR TIEMPO
+    private void TimedQueue(Integer transition, long timeLeft) throws InterruptedException {
+        synchronized (transitionLocks.get(transition)) {
+            // Informo que hay un hilo esperando a que se sensibilice la transición por tiempo
+            timedQueued.set(transition, true);
+
+            // Libero el mutex
+            if (mutex.availablePermits() == 0) {
+                mutex.release();
+            }
+
+            // Duermo el tiempo que hace falta
+            transitionLocks.get(transition).wait(timeLeft);
+
+            // Adquiero el mutex
+            mutex.acquire();
+
+            // Informo que ya no hay un hilo esperando por tiempo
+            timedQueued.set(transition, false);
+        }
+    }
+
     public Boolean fireTransition(Integer transition) {
         try {
             mutex.acquire();
@@ -39,66 +83,52 @@ public class Monitor {
                     return false;
                 }
 
+                // Si hay un hilo durmiendo por tiempo tiene prioridad, voy directo a la cola de condición
+                if (timedQueued.get(transition)){
+                    ContitionQueue(transition);
+                }
+
                 long timeLeft = rdp.isEnabled(transition);
 
-                // Si está sensibilizada la disparo
+                // Si la transición está sensibilizada la disparo
                 if (timeLeft == 0){
                     System.out.println("Disparando transición: T" + transition + " por " + Thread.currentThread().getName());
                     rdp.fire(transition);
                     break;
                 }
 
-                // COLAS DE CONDICIÓN
-                synchronized (transitionLocks.get(transition)){
-                    if (timeLeft == -1 || timedQueued.get(transition)) {
-                        // Informo que hay un hilo más en la cola de condición
-                        threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
-                        System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
-
-                        // Si no está sensibilizada y tengo en mutex lo libero
-                        if (mutex.availablePermits() == 0) {
-                            mutex.release();
-                        }
-
-                        transitionLocks.get(transition).wait();
-
-                        // Al despertar informo que hay un hilo menos en la cola de condición
-                        threadsOnQueue.set(transition, threadsOnQueue.get(transition) - 1);
-                    } else {
-                        // Informo que hay un hilo esperando a que se sensibilice la transición por tiempo
-                        timedQueued.set(transition, true);
-                        // Libero el mutex
-                        if (mutex.availablePermits() == 0) {
-                            mutex.release();
-                        }
-                        // Duermo el tiempo que hace falta
-                        transitionLocks.get(transition).wait(timeLeft);
-                        // Adquiero el mutex
-                        mutex.acquire();
-                        // Informo que ya no hay un hilo esperando
-                        timedQueued.set(transition, false);
-                    }
+                if (timeLeft == -1) {
+                    // Si no está sensibilizada por marcado entro a la cola de condición
+                    ContitionQueue(transition);
+                } else {
+                    // Si no está sensibilizada por tiempo entro a la cola temporizada
+                    TimedQueue(transition, timeLeft);
                 }
             }
 
-            // Notificar transiciones habilitadas
+            // Adquiero las nuevas transiciones que se habilitaron
             List<Integer> enabled = rdp.whichEnabledAfterLastFired();
+
+            // De estas filtro las que no tienen hilos en la cola de condición o tiene un hilo en la temporizada
             List<Integer> ready = new ArrayList<>();
             for (Integer T : enabled) {
-                if (threadsOnQueue.get(T) > 0 && !timedQueued.get(T))
+                if (threadsOnQueue.get(T) > 0 && !timedQueued.get(T)) {
                     ready.add(T);
+                }
             }
+
             // Si no hay hilos que despertar liberar el mutex y retornar
             if (ready.isEmpty()){
                 mutex.release();
                 return true;
             }
-            else {
-                Integer to_awake = policy.decide(ready);
-                synchronized (transitionLocks.get(to_awake)) {
-                    transitionLocks.get(to_awake).notify();
-                }
+
+            // Pero si hay, elegir uno y despertarlo sin liberar el mutex para darle prioridad
+            Integer to_awake = policy.decide(ready);
+            synchronized (transitionLocks.get(to_awake)) {
+                transitionLocks.get(to_awake).notify();
             }
+
             // No liberamos el mutex después de despertar un hilo a menos que ya se hayan completado todos los invariantes
             if (allInvariantsCompleted) {
                 mutex.release();
