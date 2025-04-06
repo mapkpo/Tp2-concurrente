@@ -44,15 +44,15 @@ public class Rdp {
 
     List<Integer> transitionSleepTime = Collections.unmodifiableList
             (Arrays.asList(100 , 0 , 0 , 100, 100, 0,  0,  100, 100, 100, 100, 0,   0,    100, 100, 0, 100));
-            //                  t0   t1  t2   t3   t4   t5  t6  t7   t8   t9   t10  t11  t12   t13  t14 t15 t16
+            //             t0   t1  t2   t3   t4   t5  t6  t7   t8   t9   t10  t11  t12   t13  t14 t15 t16
 
     private final long[] transitionTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    private int[] firedCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private final int[] firedCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     private String sequence = "";
 
-    private int maxInvariant;
+    private final int maxInvariant;
 
     private int lastFired;
 
@@ -198,8 +198,7 @@ public class Rdp {
 
             adisparar1.setEntry(a, 1);
 
-            RealVector nuevomarcado = incidence.operate(adisparar1).add(marking);
-            marking = nuevomarcado;
+            marking = incidence.operate(adisparar1).add(marking);
 
             transitionTime[a] = -1;
 
