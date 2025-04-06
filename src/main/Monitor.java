@@ -4,13 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
     private final Rdp rdp;
     private final Semaphore mutex;
     private boolean allInvariantsCompleted;
-
     private final Policy policy;
     private final Map<Integer, Object> transitionLocks = new HashMap<>();
     private final List<Boolean> timedQueued = new ArrayList<>();
@@ -75,9 +73,6 @@ public class Monitor {
                         }
                         // Duermo el tiempo que hace falta
                         transitionLocks.get(transition).wait(timeLeft);
-                        if (allInvariantsCompleted){
-                            return false;
-                        }
                         // Adquiero el mutex
                         mutex.acquire();
                         // Informo que ya no hay un hilo esperando
@@ -90,7 +85,7 @@ public class Monitor {
             List<Integer> enabled = rdp.whichEnabledAfterLastFired();
             List<Integer> ready = new ArrayList<>();
             for (Integer T : enabled) {
-                if (threadsOnQueue.get(T) > 0)
+                if (threadsOnQueue.get(T) > 0 && !timedQueued.get(T))
                     ready.add(T);
             }
             // Si no hay hilos que despertar liberar el mutex y retornar
