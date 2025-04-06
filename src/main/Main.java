@@ -102,7 +102,7 @@ public class Main {
             exporters[i].setName("Exporter " + i);
         }
 
-        Log logger = new Log(creators, loadersLeft, loadersRight, adjustersLeft, adjustersRight, trimmersRight, exporters, monitor);
+        Log logger = new Log(creators, loadersLeft, loadersRight, adjustersLeft, adjustersRight, trimmersLeft, trimmersRight, exporters, monitor);
         new Thread(logger).start();
 
         for (int i = 0; i < creatorThreads; i++){

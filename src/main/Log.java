@@ -12,20 +12,22 @@ public class Log implements Runnable {
     Threads[] threadRightLoader;
     Threads[] threadLeftAdjusters;
     Threads[] threadRightAdjusters;
-    Threads[] threadTrimmers;
+    Threads[] threadLeftTrimmers;
+    Threads[] threadRightTrimmers;
     Threads[] threadExporters;
     Monitor monitor;
     File file;
     File file1;
     final Long INITIAL_TIME = System.currentTimeMillis();
     
-    public Log(Threads[] threadCreator, Threads[] threadLeftLoader, Threads[] threadRightLoader, Threads[] threadLeftAdjusters, Threads[] threadRightAdjusters, Threads[] threadTrimmers, Threads[] threadExporters, Monitor monitor){
+    public Log(Threads[] threadCreator, Threads[] threadLeftLoader, Threads[] threadRightLoader, Threads[] threadLeftAdjusters, Threads[] threadRightAdjusters, Threads[] threadLeftTrimmers, Threads[] threadRightTrimmers, Threads[] threadExporters, Monitor monitor){
         this.threadCreator = threadCreator;
         this.threadLeftLoader = threadLeftLoader;
         this.threadRightLoader = threadRightLoader;
         this.threadLeftAdjusters = threadLeftAdjusters;
         this.threadRightAdjusters = threadRightAdjusters;
-        this.threadTrimmers = threadTrimmers;
+        this.threadLeftTrimmers = threadLeftTrimmers;
+        this.threadRightTrimmers = threadRightTrimmers;
         this.threadExporters = threadExporters;
         this.monitor = monitor;
         count = 0;
@@ -114,7 +116,10 @@ public class Log implements Runnable {
                 for (Threads thread: threadRightAdjusters){
                     writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
-                for (Threads thread: threadTrimmers){
+                for (Threads thread: threadLeftTrimmers){
+                    writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
+                }
+                for (Threads thread: threadRightTrimmers){
                     writer.write("Hilo: "+thread.getName() +". Estado: "+thread.getState()+"\n");
                 }
                 for (Threads thread: threadExporters){
