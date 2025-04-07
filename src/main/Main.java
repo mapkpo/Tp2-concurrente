@@ -71,7 +71,7 @@ public class Main {
         Threads[] loadersRight = new Threads[loaderThreadsRight];
         Threads[] adjustersLeft = new Threads[adjustersThreadsLeft];
         Threads[] adjustersRight = new Threads[adjustersThreadsRight];
-        Threads[] trimmersLeft = new Threads[trimmersThreadsRight];
+        Threads[] trimmersLeft = new Threads[trimmersThreadsLeft];
         Threads[] trimmersRight = new Threads[trimmersThreadsRight];
         Threads[] exporters = new Threads[exportersThreads];
 
