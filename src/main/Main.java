@@ -5,17 +5,17 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         // Límite máximo de disparos para la transición 0
-        int maxFiresForT0 = 10;
+        int maxFiresForT0 = 200;
 
         // Número de threads que ejecutan cada tarea. Idealmente todos son 1.
-        int creatorThreads = 5;
-        int loaderThreadsLeft = 5;
-        int loaderThreadsRight = 5;
-        int adjustersThreadsLeft = 5;
-        int adjustersThreadsRight = 5;
-        int trimmersThreadsLeft = 5;
-        int trimmersThreadsRight = 5;
-        int exportersThreads = 5;
+        int creatorThreads = 100;
+        int loaderThreadsLeft = 100;
+        int loaderThreadsRight = 100;
+        int adjustersThreadsLeft = 100;
+        int adjustersThreadsRight = 100;
+        int trimmersThreadsLeft = 100;
+        int trimmersThreadsRight = 100;
+        int exportersThreads = 100;
 
         // Declaramos las transiciones que dispara cada hilo en orden
 
