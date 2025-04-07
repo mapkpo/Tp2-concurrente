@@ -88,6 +88,12 @@ public class Monitor {
                     ConditionQueue(transition);
                 }
 
+                // Verificamos si ya se completaron los invariantes después de despertar
+                if (allInvariantsCompleted) {
+                    mutex.release();
+                    return false;
+                }
+
                 long timeLeft = rdp.isEnabled(transition);
 
                 // Si la transición está sensibilizada la disparo
