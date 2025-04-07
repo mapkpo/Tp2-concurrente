@@ -23,7 +23,7 @@ public class Monitor {
         allInvariantsCompleted = false;
 
         for (int i = 0; i < rdp.transitionsNo; i++){
-            transitionLocks.set(i, new Semaphore(0));
+            transitionLocks.add(new Semaphore(0));
             timedQueued.add(false);
             threadsOnQueue.add(0);
         }
@@ -125,9 +125,7 @@ public class Monitor {
 
             // Pero si hay, elegir uno y despertarlo sin liberar el mutex para darle prioridad
             Integer to_awake = policy.decide(ready);
-            synchronized (transitionLocks.get(to_awake)) {
-                transitionLocks.get(to_awake).notify();
-            }
+            transitionLocks.get(to_awake).release();
 
             // No liberamos el mutex después de despertar un hilo a menos que ya se hayan completado todos los invariantes
             if (allInvariantsCompleted) {
@@ -149,9 +147,7 @@ public class Monitor {
             allInvariantsCompleted = true;
             System.out.println(rdp.getSequence());
             for (int i = 0; i < transitionLocks.size(); i++) {
-                synchronized (transitionLocks.get(i)){
-                    transitionLocks.get(i).notifyAll();
-                }
+                transitionLocks.get(i).release(5000);
             }
             synchronized (this){
                 notifyAll();
