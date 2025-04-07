@@ -3,95 +3,79 @@ skinparam classAttributeIconSize 0
 skinparam linetype ortho
 
 ' ======== CLASES PRINCIPALES ========
-class Main {
-    +main(String[] args)
+
+package main {
+
+    class Main {
+        +main(args: String[]): void
+    }
+
+    class Threads {
+        -transitions: List<Integer>
+        -monitor: Monitor
+        +run(): void
+    }
+
+    class Monitor {
+        -rdp: Rdp
+        -mutex: Semaphore
+        -policy: Policy
+        -transitionLocks: Map<Integer, Object>
+        -timedQueued: List<Boolean>
+        -threadsOnQueue: List<Integer>
+        -allInvariantsCompleted: boolean
+        +fireTransition(t: Integer): Boolean
+        +areInvariantsCompleted(): boolean
+        +getRdp(): Rdp
+    }
+
+    class Policy {
+        -policyTypeEquitative: boolean
+        +decide(transitions: List<Integer>): Integer
+    }
+
+    class Rdp {
+        +transitionsNo: int
+        -incidenceMatrix: double[][]
+        -initialMarking: double[]
+        -marking: double[]
+        -transitionTime: long[]
+        -firedCount: int[]
+        -transitionSleepTime: List<Integer>
+        -maxInvariant: int
+        -lastFired: int
+        -sequence: String
+        +isEnabled(t: int): long
+        +fire(t: int): void
+        +getMarking(p: int): int
+        +whichEnabled(): List<Integer>
+        +whichEnabledAfterLastFired(): List<Integer>
+        +testPlaceInvariant(): void
+        +getFiredCounter(): int[]
+        +completedInvariants(): boolean
+        +getSequence(): String
+    }
+
+    class Log {
+        -INITIAL_TIME: Long
+        +run(): void
+        -writeFile(): void
+        -logWriteSequence(): void
+        -writeSequenceOnly(): void
+    }
+
+    Main --> Monitor
+    Main --> Policy
+    Main --> Rdp
+    Main --> Threads
+    Main --> Log
+
+    Threads --> Monitor
+    Monitor --> Rdp
+    Monitor --> Policy
+    Log --> Monitor
+    Log --> Threads
+
 }
 
-class Monitor {
-    -Rdp rdp
-    -Semaphore mutex
-    -boolean allInvariantsCompleted
-    -Policy policy
-    -Map<Integer, Object> transitionLocks
-    -List<Boolean> timedQueued
-    -List<Integer> threadsOnQueue
-    +fireTransition(Integer): Boolean
-    +areInvariantsCompleted(): boolean
-    +getRdp(): Rdp
-    -finish(): void
-    -ContitionQueue(Integer): void
-    -TimedQueue(Integer, long): void
-}
-
-class Policy {
-    -boolean policyTypeEquitative
-    -Random rand
-    +Policy(boolean)
-    +decide(List<Integer>): Integer
-}
-
-class Threads {
-    -List<Integer> transitions
-    -Monitor monitor
-    +Threads(List<Integer>, Monitor)
-    +run()
-}
-
-class Log {
-    -int count
-    -Threads[] threadCreator
-    -Threads[] threadLeftLoader
-    -Threads[] threadRightLoader
-    -Threads[] threadLeftAdjusters
-    -Threads[] threadRightAdjusters
-    -Threads[] threadLeftTrimmers
-    -Threads[] threadRightTrimmers
-    -Threads[] threadExporters
-    -Monitor monitor
-    -File file
-    -File file1
-    +run()
-    -writeFile(): void
-    -logWriteSequence(): void
-    -writeSequenceOnly(): void
-}
-
-class Rdp {
-    +int transitionsNo
-    -double[][] incidenceMatrix
-    -double[] initialMarking
-    -double[] transitionMatrix
-    -List<Integer> transitionSleepTime
-    -long[] transitionTime
-    -int[] firedCount
-    -String sequence
-    -int maxInvariant
-    -int lastFired
-    +Rdp(int)
-    +isEnabled(int): long
-    +whichEnabled(): List<Integer>
-    +whichEnabledAfterLastFired(): List<Integer>
-    +fire(int)
-    +getSequence(): String
-    +getFiredCounter(): int[]
-    +completedInvariants(): Boolean
-    +getMarking(int): int
-    -testPlaceInvariant(): void
-    -printMarking(): void
-}
-
-' ======== RELACIONES ENTRE CLASES ========
-Main --> Monitor : crea
-Main --> Policy : crea
-Main --> Rdp : crea
-Main --> Threads : instancia
-Main --> Log : crea
-
-Monitor *-- Rdp
-Monitor *-- Policy
-Monitor o-- Threads
-
-Threads --> Monitor
-Log *-- Threads : contiene multiples
-Log *-- Monitor
 @enduml
