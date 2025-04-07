@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
+import static java.lang.Thread.sleep;
+
 public class Monitor {
     private final Rdp rdp;
     private final Semaphore mutex;
     private boolean allInvariantsCompleted;
     private final Policy policy;
-    private final Map<Integer, Object> transitionLocks = new HashMap<>();
+    private final List<Semaphore> transitionLocks = new ArrayList<>();
     private final List<Boolean> timedQueued = new ArrayList<>();
     private final List<Integer> threadsOnQueue = new ArrayList<>();
 
@@ -21,7 +23,7 @@ public class Monitor {
         allInvariantsCompleted = false;
 
         for (int i = 0; i < rdp.transitionsNo; i++){
-            transitionLocks.put(i, new Object());
+            transitionLocks.set(i, new Semaphore(0));
             timedQueued.add(false);
             threadsOnQueue.add(0);
         }
@@ -29,46 +31,38 @@ public class Monitor {
 
     // COLAS DE CONDICIÓN
     private void ConditionQueue(Integer transition) throws InterruptedException {
-        synchronized (transitionLocks.get(transition)) {
-            // Informo que hay un hilo más en la cola de condición
-            threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
-            System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
+        // Informo que hay un hilo más en la cola de condición
+        threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
+        System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
 
-            // Si tengo el mutex lo libero
-            if (mutex.availablePermits() == 0) {
-                mutex.release();
-            }
+        // Si tengo el mutex lo libero
+        mutex.release();
 
-            // Espero
-            transitionLocks.get(transition).wait();
+        // Espero
+        transitionLocks.get(transition).acquire();
 
-            // No hace falta tomar el mutex nuevamente ya que quien despertó el hilo no lo liberó
+        // No hace falta tomar el mutex nuevamente ya que quien despertó el hilo no lo liberó
 
-            // Al despertar informo que hay un hilo menos en la cola de condición
-            threadsOnQueue.set(transition, threadsOnQueue.get(transition) - 1);
-        }
+        // Al despertar informo que hay un hilo menos en la cola de condición
+        threadsOnQueue.set(transition, threadsOnQueue.get(transition) - 1);
     }
 
     // COLA DE CONDICIÓN POR TIEMPO
     private void TimedQueue(Integer transition, long timeLeft) throws InterruptedException {
-        synchronized (transitionLocks.get(transition)) {
-            // Informo que hay un hilo esperando a que se sensibilice la transición por tiempo
-            timedQueued.set(transition, true);
+        // Informo que hay un hilo esperando a que se sensibilice la transición por tiempo
+        timedQueued.set(transition, true);
 
-            // Libero el mutex
-            if (mutex.availablePermits() == 0) {
-                mutex.release();
-            }
+        // Libero el mutex
+        mutex.release();
 
-            // Duermo el tiempo que hace falta
-            transitionLocks.get(transition).wait(timeLeft);
+        // Duermo el tiempo que hace falta
+        sleep(timeLeft);
 
-            // Adquiero el mutex
-            mutex.acquire();
+        // Adquiero el mutex
+        mutex.acquire();
 
-            // Informo que ya no hay un hilo esperando por tiempo
-            timedQueued.set(transition, false);
-        }
+        // Informo que ya no hay un hilo esperando por tiempo
+        timedQueued.set(transition, false);
     }
 
     public Boolean fireTransition(Integer transition) {
@@ -113,7 +107,7 @@ public class Monitor {
             }
 
             // Adquiero las nuevas transiciones que se habilitaron
-            List<Integer> enabled = rdp.whichEnabledAfterLastFired();
+            List<Integer> enabled = rdp.whichEnabled();
 
             // De estas filtro las que no tienen hilos en la cola de condición o tiene un hilo en la temporizada
             List<Integer> ready = new ArrayList<>();
