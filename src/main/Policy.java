@@ -35,7 +35,7 @@ public class Policy {
                 }
             default:
                 int randomIndex = rand.nextInt(transitions.size());
-                System.err.println(transitions);
+                //System.err.println(transitions);
                 return transitions.get(randomIndex);
         }
     }
