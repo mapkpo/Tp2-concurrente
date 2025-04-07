@@ -15,11 +15,12 @@ public class Log implements Runnable {
     Threads[] threadLeftTrimmers;
     Threads[] threadRightTrimmers;
     Threads[] threadExporters;
-    Monitor monitor;
+    final Monitor monitor;
     File file;
     File file1;
     final Long INITIAL_TIME = System.currentTimeMillis();
-    
+    static Log instance;
+
     public Log(Threads[] threadCreator, Threads[] threadLeftLoader, Threads[] threadRightLoader, Threads[] threadLeftAdjusters, Threads[] threadRightAdjusters, Threads[] threadLeftTrimmers, Threads[] threadRightTrimmers, Threads[] threadExporters, Monitor monitor){
         this.threadCreator = threadCreator;
         this.threadLeftLoader = threadLeftLoader;
@@ -66,6 +67,11 @@ public class Log implements Runnable {
         catch (IOException e) {
             System.out.println("Problema al crear el archivo de LOG.");
         }
+        instance = this;
+    }
+
+    static Log getInstance(){
+        return instance;
     }
 
     @Override
@@ -74,7 +80,9 @@ public class Log implements Runnable {
             try {
                 writeFile();
                 this.count++;
-                Threads.sleep(500);
+                synchronized (monitor){
+                    monitor.wait(500);
+                }
             }
             catch (InterruptedException e) {
                 throw new RuntimeException(e);

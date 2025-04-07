@@ -159,6 +159,9 @@ public class Monitor {
                     transitionLocks.get(i).notifyAll();
                 }
             }
+            synchronized (this){
+                notifyAll();
+            }
         }
     }
 
