@@ -8,14 +8,14 @@ public class Main {
         int maxFiresForT0 = 200;
 
         // Número de threads que ejecutan cada tarea. Idealmente todos son 1.
-        int creatorThreads = 100;
-        int loaderThreadsLeft = 100;
-        int loaderThreadsRight = 100;
-        int adjustersThreadsLeft = 100;
-        int adjustersThreadsRight = 100;
-        int trimmersThreadsLeft = 100;
-        int trimmersThreadsRight = 100;
-        int exportersThreads = 100;
+        int creatorThreads = 1;
+        int loaderThreadsLeft = 1;
+        int loaderThreadsRight = 1;
+        int adjustersThreadsLeft = 1;
+        int adjustersThreadsRight = 1;
+        int trimmersThreadsLeft = 1;
+        int trimmersThreadsRight = 1;
+        int exportersThreads = 1;
 
         // Declaramos las transiciones que dispara cada hilo en orden
 
