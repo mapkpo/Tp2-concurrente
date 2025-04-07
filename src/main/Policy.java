@@ -20,17 +20,22 @@ public class Policy {
             case 1:
                 return transitions.get(0);
             case 2:
-                if (policyTypeEquitative){
-                    if (probability <= 0.5){
-                        return transitions.get(0);
-                    } else return transitions.get(1);
-                } else {
-                    if (probability <= 0.8){
-                        return transitions.get(0);
-                    } else return transitions.get(1);
+                if (transitions.contains(11) && transitions.contains(12)) {
+                    if (policyTypeEquitative){
+                        if (probability <= 0.5){
+                            return 11;
+                        } else return 12;
+
+                    } 
+                        else {
+                            if (probability <= 0.8){
+                                return 11;
+                            } else return 12;
+                        }
                 }
             default:
                 int randomIndex = rand.nextInt(transitions.size());
+                System.err.println(transitions);
                 return transitions.get(randomIndex);
         }
     }

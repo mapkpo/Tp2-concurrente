@@ -44,7 +44,7 @@ t11_count = len(re.findall(r'T11', data))
 t12_count = len(re.findall(r'T12', data))
 
 
-# print("Data sobrante: " + data)
+print("Data sobrante: " + data)
 # print(f"Las transiciones T11 y T12 se han disparado un extra de: {t11_count} , {t12_count} veces")
 print("\n" + str(total_count) + " invariantes encontradas.")
 for i, (count, (_, pattern)) in enumerate(zip(invariant_counts, invariant_patterns)):
