@@ -1,8 +1,6 @@
 package main;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import static java.lang.Thread.sleep;
@@ -30,7 +28,7 @@ public class Monitor {
     }
 
     // COLAS DE CONDICIÓN
-    private void ConditionQueue(Integer transition) throws InterruptedException {
+    private void conditionQueue(Integer transition) throws InterruptedException {
         // Informo que hay un hilo más en la cola de condición
         threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
         System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
@@ -48,7 +46,7 @@ public class Monitor {
     }
 
     // COLA DE CONDICIÓN POR TIEMPO
-    private void TimedQueue(Integer transition, long timeLeft) throws InterruptedException {
+    private void timedQueue(Integer transition, long timeLeft) throws InterruptedException {
         // Informo que hay un hilo esperando a que se sensibilice la transición por tiempo
         timedQueued.set(transition, true);
 
@@ -79,7 +77,7 @@ public class Monitor {
 
                 // Si hay un hilo durmiendo por tiempo tiene prioridad, voy directo a la cola de condición
                 if (timedQueued.get(transition)){
-                    ConditionQueue(transition);
+                    conditionQueue(transition);
                 }
 
                 // Verificamos si ya se completaron los invariantes después de despertar
@@ -99,10 +97,10 @@ public class Monitor {
 
                 if (timeLeft == -1) {
                     // Si no está sensibilizada por marcado entro a la cola de condición
-                    ConditionQueue(transition);
+                    conditionQueue(transition);
                 } else {
                     // Si no está sensibilizada por tiempo entro a la cola temporizada
-                    TimedQueue(transition, timeLeft);
+                    timedQueue(transition, timeLeft);
                 }
             }
 
@@ -146,8 +144,8 @@ public class Monitor {
         if (rdp.completedInvariants()){
             allInvariantsCompleted = true;
             System.out.println(rdp.getSequence());
-            for (int i = 0; i < transitionLocks.size(); i++) {
-                transitionLocks.get(i).release(5000);
+            for (Semaphore transitionLock : transitionLocks) {
+                transitionLock.release(5000);
             }
             synchronized (this){
                 notifyAll();
