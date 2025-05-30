@@ -1,167 +1,164 @@
 package main;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static java.lang.Thread.sleep;
 
 public class Monitor {
-    private final Rdp petri;
-    // Mutex protege el acceso a los contenedores
-    final private Semaphore mutex;
-    final private Politic politic;
-    final private ReentrantReadWriteLock petriRWLock;
+    private final Rdp rdp;
+    private final Semaphore mutex;
+    private boolean allInvariantsCompleted;
+    private final Policy policy;
+    private final List<Semaphore> transitionLocks = new ArrayList<>();
+    private final List<Boolean> timedQueued = new ArrayList<>();
+    private final List<Integer> threadsOnQueue = new ArrayList<>();
 
-    private boolean allInvariantsCompleted = false; //bandera para parar hilos
-    long startTime;
-    long endTime;
+    public Monitor(Rdp rdp, Policy policy) {
+        this.rdp = rdp;
+        this.mutex = new Semaphore(1);
+        this.policy = policy;
+        allInvariantsCompleted = false;
 
-    Container[] buffers;
-    Semaphore[] containerSems;
-
-    public Monitor(Politic _politic, int containersAmount){
-        petri = new Rdp();
-        mutex = new Semaphore(1, true);
-        politic = _politic;
-
-        petriRWLock = new ReentrantReadWriteLock(true);
-        buffers = new Container[containersAmount];
-        containerSems = new Semaphore[containersAmount];
-        for (int i = 0; i < containersAmount; i++){
-            buffers[i] = new Container();
-            containerSems[i] = new Semaphore(1,true);
+        for (int i = 0; i < rdp.transitionsNo; i++){
+            transitionLocks.add(new Semaphore(0));
+            timedQueued.add(false);
+            threadsOnQueue.add(0);
         }
-
-        startTime = System.currentTimeMillis();
     }
 
-    /* Tries to acquire the mutex. */
-    private void getMutex() throws InterruptedException {
+    // COLAS DE CONDICIÓN
+    private void conditionQueue(Integer transition) throws InterruptedException {
+        // Informo que hay un hilo más en la cola de condición
+        threadsOnQueue.set(transition, threadsOnQueue.get(transition) + 1);
+        System.out.println("Hilo " + Thread.currentThread().getName() + " esperará hasta ser notificado");
+
+        // Si tengo el mutex lo libero
+        mutex.release();
+
+        // Espero
+        transitionLocks.get(transition).acquire();
+
+        // No hace falta tomar el mutex nuevamente ya que quien despertó el hilo no lo liberó
+
+        // Al despertar informo que hay un hilo menos en la cola de condición
+        threadsOnQueue.set(transition, threadsOnQueue.get(transition) - 1);
+    }
+
+    // COLA DE CONDICIÓN POR TIEMPO
+    private void timedQueue(Integer transition, long timeLeft) throws InterruptedException {
+        // Informo que hay un hilo esperando a que se sensibilice la transición por tiempo
+        timedQueued.set(transition, true);
+
+        // Libero el mutex
+        mutex.release();
+
+        // Duermo el tiempo que hace falta
+        sleep(timeLeft);
+
+        // Adquiero el mutex
         mutex.acquire();
+
+        // Informo que ya no hay un hilo esperando por tiempo
+        timedQueued.set(transition, false);
     }
 
-    private boolean writeRDP(int transition){
-        try {
-            petriRWLock.writeLock().lock();
-        } catch (Exception e){
-            return false;
-        }
-        if (!petri.isEnabled(transition)) {
-            petriRWLock.writeLock().unlock();
-            return false;
-        }
-        petri.fire(transition);
-        petriRWLock.writeLock().unlock();
-        return true;
-    }
-
-    public boolean shootTransition(int transition){
+    public Boolean fireTransition(Integer transition) {
         try {
             mutex.acquire();
-        } catch (InterruptedException e){
-            return false;
+            finish();
+
+            while (true) {
+                // Verificamos si ya se completaron los invariantes después de despertar
+                if (allInvariantsCompleted) {
+                    mutex.release();
+                    return false;
+                }
+
+                // Si hay un hilo durmiendo por tiempo tiene prioridad, voy directo a la cola de condición
+                if (timedQueued.get(transition)){
+                    conditionQueue(transition);
+                }
+
+                // Verificamos si ya se completaron los invariantes después de despertar
+                if (allInvariantsCompleted) {
+                    mutex.release();
+                    return false;
+                }
+
+                long timeLeft = rdp.isEnabled(transition);
+
+                // Si la transición está sensibilizada la disparo
+                if (timeLeft == 0){
+                    System.out.println("Disparando transición: T" + transition + " por " + Thread.currentThread().getName());
+                    rdp.fire(transition);
+                    break;
+                }
+
+                if (timeLeft == -1) {
+                    // Si no está sensibilizada por marcado entro a la cola de condición
+                    conditionQueue(transition);
+                } else {
+                    // Si no está sensibilizada por tiempo entro a la cola temporizada
+                    timedQueue(transition, timeLeft);
+                }
+            }
+
+            // Adquiero las nuevas transiciones que se habilitaron
+            List<Integer> enabled = rdp.whichEnabled();
+
+            // De estas filtro las que no tienen hilos en la cola de condición o tiene un hilo en la temporizada
+            List<Integer> ready = new ArrayList<>();
+            for (Integer T : enabled) {
+                if (threadsOnQueue.get(T) > 0 && !timedQueued.get(T)) {
+                    ready.add(T);
+                }
+            }
+
+            // Si no hay hilos que despertar liberar el mutex y retornar
+            if (ready.isEmpty()){
+                mutex.release();
+                return true;
+            }
+
+            // Pero si hay, elegir uno y despertarlo sin liberar el mutex para darle prioridad
+            Integer to_awake = policy.decide(ready);
+            transitionLocks.get(to_awake).release();
+
+            // No liberamos el mutex después de despertar un hilo a menos que ya se hayan completado todos los invariantes
+            if (allInvariantsCompleted) {
+                mutex.release();
+                return false;
+            }
+            return true;
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        boolean toReturn = writeRDP(transition);
-        mutex.release();
-        return toReturn;
     }
 
-    public boolean readRDP(int transition){
-        try {
-            petriRWLock.readLock().lock();
-        } catch (Exception e){
-            return false;
+    private void finish(){
+        if(allInvariantsCompleted)
+            return;
+
+        if (rdp.completedInvariants()){
+            allInvariantsCompleted = true;
+            System.out.println(rdp.getSequence());
+            for (Semaphore transitionLock : transitionLocks) {
+                transitionLock.release(5000);
+            }
+            synchronized (this){
+                notifyAll();
+            }
         }
-        boolean toReturn = petri.isEnabled(transition);
-        petriRWLock.readLock().unlock();
-        return toReturn;
     }
 
-    public boolean addImageToContainer(int containerNum, int transition, Image image){
-        try {
-            containerSems[containerNum].acquire();
-        } catch (Exception e){
-            return false;
-        }
-
-        try {
-            mutex.acquire();
-        } catch (InterruptedException e){
-            containerSems[containerNum].release();
-            return false;
-        }
-
-        if (!writeRDP(transition)) {
-            containerSems[containerNum].release();
-            mutex.release();
-            return false;
-        }
-
-        buffers[containerNum].add(image);
-        containerSems[containerNum].release();
-        mutex.release();
-        return true;
-    }
-
-    public Image getImageFromContainer(int containerNum, int transition){
-        try {
-            containerSems[containerNum].acquire();
-        } catch (Exception e){
-            return null;
-        }
-
-        try {
-            mutex.acquire();
-        } catch (InterruptedException e){
-            containerSems[containerNum].release();
-            return null;
-        }
-
-        // Hay realmente una imagen para tomar?
-        Image toReturn = buffers[containerNum].getImage();
-        if (toReturn == null){
-            containerSems[containerNum].release();
-            mutex.release();
-            return null;
-        }
-
-        //Está realmente sensibilizada la transición?
-        if (!writeRDP(transition)) {
-            // Sino volvemos a guardar la imágen
-            buffers[containerNum].silentAdd(toReturn);
-            containerSems[containerNum].release();
-            mutex.release();
-            return null;
-        }
-
-        containerSems[containerNum].release();
-        mutex.release();
-        return toReturn;
-    }
-
-    public boolean isReadyToFinish(){
+    public boolean areInvariantsCompleted() {
         return allInvariantsCompleted;
     }
 
-    public void finish(){
-        allInvariantsCompleted = true;
-        try {
-            getMutex();
-        } catch (InterruptedException ignored){
-
-        }
-        System.out.println("Programa finalizado con: " + buffers[buffers.length - 1].getAdded() + " invariantes");
-        petri.printCounter();
-        mutex.release();
-        //System.out.print(petri.getSecuencia());
+    public Rdp getRdp(){
+        return rdp;
     }
 
-    public String getSequence(){
-        return petri.getSequence();
-    }
-
-    public int getBufferCount(int bufferNum){
-        return buffers[bufferNum].getAdded();
-    }
-
-    public String getBalanceCount(){
-        return petri.counterString();
-    }
 }

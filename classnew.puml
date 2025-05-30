@@ -1,0 +1,81 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' ======== CLASES PRINCIPALES ========
+
+package main {
+
+    class Main {
+        +main(args: String[]): void
+    }
+
+    class Threads {
+        -transitions: List<Integer>
+        -monitor: Monitor
+        +run(): void
+    }
+
+    class Monitor {
+        -rdp: Rdp
+        -mutex: Semaphore
+        -policy: Policy
+        -transitionLocks: Map<Integer, Object>
+        -timedQueued: List<Boolean>
+        -threadsOnQueue: List<Integer>
+        -allInvariantsCompleted: boolean
+        +fireTransition(t: Integer): Boolean
+        +areInvariantsCompleted(): boolean
+        +getRdp(): Rdp
+    }
+
+    class Policy {
+        -policyTypeEquitative: boolean
+        +decide(transitions: List<Integer>): Integer
+    }
+
+    class Rdp {
+        +transitionsNo: int
+        -incidenceMatrix: double[][]
+        -initialMarking: double[]
+        -marking: double[]
+        -transitionTime: long[]
+        -firedCount: int[]
+        -transitionSleepTime: List<Integer>
+        -maxInvariant: int
+        -lastFired: int
+        -sequence: String
+        +isEnabled(t: int): long
+        +fire(t: int): void
+        +getMarking(p: int): int
+        +whichEnabled(): List<Integer>
+        +whichEnabledAfterLastFired(): List<Integer>
+        +testPlaceInvariant(): void
+        +getFiredCounter(): int[]
+        +completedInvariants(): boolean
+        +getSequence(): String
+    }
+
+    class Log {
+        -INITIAL_TIME: Long
+        +run(): void
+        -writeFile(): void
+        -logWriteSequence(): void
+        -writeSequenceOnly(): void
+    }
+
+    Main --> Monitor
+    Main --> Policy
+    Main --> Rdp
+    Main --> Threads
+    Main --> Log
+
+    Threads --> Monitor
+    Monitor --> Rdp
+    Monitor --> Policy
+    Log --> Monitor
+    Log --> Threads
+
+}
+
+@enduml

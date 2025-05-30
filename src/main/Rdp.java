@@ -1,184 +1,206 @@
 package main;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-public class Rdp {
-    private final double[][] incidenceMatrix = {
 
-        //  t0  t1  t2   t3  t4  t5  t6  t7  t8  t9  t10 t11 t12 t13 t14 t15 t16
-            {1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p0
-            {0, -1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p1
-            {0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p2
-            {0, -1, -1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1}, //p3
-            {0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p4
-            {0,  0, -1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p5
-            {0,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p6
-            {0,  0,  0,  0,  0, -1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0}, //p7
-            {0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0}, //p8
-            {0,  0,  0,  0,  0, -1, -1,  0,  0,  1,  1,  0,  0,  0,  0,  0,  0}, //p9
-            {0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0}, //p10
-            {0,  0,  0,  0,  0,  0, -1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0}, //p11
-            {0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0}, //p12
-            {0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0}, //p13
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0}, //p14
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1,  1,  1,  0,  0}, //p15
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0}, //p16
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0}, //p17
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1,  0}, //p18
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, -1}, //p19
-            {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1}  //p20
+public class Rdp {
+    public int transitionsNo = 17;
+
+    private final double[][] incidenceMatrix = {
+        // t0  t1  t2   t3  t4  t5  t6  t7  t8  t9  t10 t11 t12 t13 t14 t15 t16
+           {1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // p0
+           {0, -1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // p1
+           {0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // p2
+           {0, -1, -1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1}, // p3
+           {0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // p4
+           {0,  0, -1,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // p5
+           {0,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // p6
+           {0,  0,  0,  0,  0, -1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0}, // p7
+           {0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0}, // p8
+           {0,  0,  0,  0,  0, -1, -1,  0,  0,  1,  1,  0,  0,  0,  0,  0,  0}, // p9
+           {0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0,  0}, // p10
+           {0,  0,  0,  0,  0,  0, -1,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0}, // p11
+           {0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0,  0}, // p12
+           {0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0,  0,  0,  0}, // p13
+           {0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0}, // p14
+           {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1,  1,  1,  0,  0}, // p15
+           {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0,  0}, // p16
+           {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  0, -1,  0,  0}, // p17
+           {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1,  0}, // p18
+           {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, -1}, // p19
+           {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1,  1}  // p20
     };
 
-                                        //p  0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20
     private final double[] initialMarking = {0, 1, 0, 3, 0, 1, 0, 1, 0, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    private final List<Integer> transitionSleepTime = Collections.unmodifiableList(
+        Arrays.asList(100 , 0 , 0 , 100, 100, 0, 0, 100, 100, 100, 100, 0, 0, 100, 100, 0, 100)
+    );
 
-    private final double[] transitionMatrix = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    List<Integer> transitionSleepTime = Collections.unmodifiableList
-            (Arrays.asList(100, 0, 0, 100, 100, 0, 0, 100, 100, 100, 100, 0, 0, 100, 100, 0, 100));
-
-    private final long[] transitionTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    private final int[] firedCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
+    private final long[] transitionTime = new long[17];
+    private final int[] firedCount = new int[17];
+    private final double[] marking = new double[21];
     private String sequence = "";
+    private int maxInvariant;
+    private int lastFired;
 
-    public Rdp() {
-        //-1 significa que la transicion no esta sensibilizada por lo que el tiempo aun no corre.
+    public Rdp(int max) {
+        System.arraycopy(initialMarking, 0, marking, 0, initialMarking.length);
         Arrays.fill(transitionTime, -1);
         transitionTime[0] = System.currentTimeMillis();
+        maxInvariant = max;
     }
 
-    private final RealMatrix incidence = MatrixUtils.createRealMatrix(incidenceMatrix);
-    private RealVector marking = new ArrayRealVector(initialMarking);
-    private final RealVector transition = new ArrayRealVector(transitionMatrix);
+    public long isEnabled(int t) {
+        if (t == 0 && firedCount[0] >= maxInvariant) return -1;
 
-
-    public boolean isEnabled(int a){
-        if(a>=0 && a< transition.getDimension()) {
-            RealVector adisparar = transition.copy();
-            adisparar.setEntry(a, 1);
-
-            RealVector result = incidence.operate(adisparar).add(marking);
-            for (int i = 0; i < result.getDimension(); i++) {
-                if (result.getEntry(i) < 0) {
-                    return false;
-                }
-            }
-
-            if (transitionTime[a] == -1)
-                transitionTime[a] = System.currentTimeMillis();
-            return (System.currentTimeMillis() - transitionTime[a] > transitionSleepTime.get(a));
+        for (int p = 0; p < marking.length; p++) {
+            if (marking[p] + incidenceMatrix[p][t] < 0) return -1;
         }
-        System.out.println(a + "esta fuera de rango");
-        return false;
+
+        if (transitionTime[t] == -1) transitionTime[t] = System.currentTimeMillis();
+
+        return Math.max(transitionTime[t] + transitionSleepTime.get(t) - System.currentTimeMillis(), 0);
+    }
+
+    public void fire(int t) {
+        testPlaceInvariant();
+        if (isEnabled(t) == 0) {
+            for (int p = 0; p < marking.length; p++) {
+                marking[p] += incidenceMatrix[p][t];
+            }
+            transitionTime[t] = -1;
+            sequence += (t < 10 ? "T0" : "T") + t;
+            firedCount[t]++;
+            lastFired = t;
+        }
     }
 
     public List<Integer> whichEnabled() {
-        List<Integer> lista = new ArrayList<>();
-
-        for (int i = 0; i < transition.getDimension(); i++) {
-            RealVector aprobar = transition.copy();
-            aprobar.setEntry(i, 1);
-
-            int contador = 0;
-
-            RealVector result = incidence.operate(aprobar).add(marking);
-            for (int j = 0; j < result.getDimension(); j++) {
-                if (result.getEntry(j) < 0) {
-                    //System.out.println("Fuera de rango");
-                    contador++;
-                }
-            }
-            if (contador == 0){
-                lista.add(i);
-            }
+        List<Integer> result = new ArrayList<>();
+        for (int t = 0; t < transitionsNo; t++) {
+            if (isEnabled(t) == 0) result.add(t);
         }
-        return lista;
+        return result;
     }
 
-    public void fire(int a){
-        testPlaceInvariant();
-        if(isEnabled(a)){
-            RealVector adisparar1 = transition.copy();
-
-            adisparar1.setEntry(a, 1);
-
-            RealVector nuevomarcado = incidence.operate(adisparar1).add(marking);
-            updateMarking(nuevomarcado);
-
-            transitionTime[a] = -1;
-
-
-            if(a<10){
-                sequence += "T0" + a;
-            } 
-            else {
-                sequence += "T" + a;
-            }
-
-            firedCount[a]++;
-        }
+    public String getSequence() {
+        return sequence;
     }
 
-    private void updateMarking(RealVector a){
-        marking = a;
+    public int[] getFiredCounter() {
+        return firedCount;
     }
 
-    public void printMarking(){
-        for(int i = 0; i< marking.getDimension(); i++){
-            System.out.println(marking.getEntry(i));
-        }
+    public int getMarking(int p) {
+        return (int) marking[p];
     }
 
-    public void printCounter(){ //este valor siempre va a ser mayor al numero de invariantes deseados debido a que la red 
-        //se sigue disparando hasta que se paran todos los hilos.
-            System.out.print("Contador del balanceo de la politica: ");
-            System.out.print(firedCount[11]);
-            System.out.print(" , ");
-            System.out.print(firedCount[12]);
-            System.out.println();
+    public boolean completedInvariants() {
+        return firedCount[16] >= maxInvariant;
     }
 
-    public String counterString(){
-        return ("Contador del balanceo de la política: "+ firedCount[11]+" , "+ firedCount[12]);
-    }
+    private void testPlaceInvariant() {
+        boolean p1 = (getMarking(1) + getMarking(2)) == 1;
+        boolean p2 = (getMarking(4) + getMarking(5)) == 1;
+        boolean p3 = (getMarking(19) + getMarking(20)) == 1;
+        boolean p4 = (getMarking(7) + getMarking(8) + getMarking(12)) == 1;
+        boolean p5 = (getMarking(15) + getMarking(16) + getMarking(17)) == 1;
+        boolean p6 = (getMarking(10) + getMarking(11) + getMarking(13)) == 1;
+        boolean p7 = (getMarking(8) + getMarking(9) + getMarking(10) + getMarking(12) + getMarking(13)) == 2;
+        boolean p8 = (getMarking(2) + getMarking(3) + getMarking(4) + getMarking(19)) == 3;
 
-    private void testPlaceInvariant(){
-        boolean p1, p2, p3, p4, p5, p6, p7, p8;
-
-        /*
-        for(int i=0; i<21; i++){
-            System.out.print("plaza: "+i+""+marcado.getEntry(i)+" , ");
-        }
-        System.out.println();
-        */
-
-        p1 = ((((int) marking.getEntry(1))+((int) marking.getEntry(2))) == 1);
-        p2 = ((((int) marking.getEntry(4))+((int) marking.getEntry(5))) == 1);
-        p3 = ((((int) marking.getEntry(19))+((int) marking.getEntry(20))) == 1);
-        p4 = ((((int) marking.getEntry(15))+((int) marking.getEntry(16))+((int) marking.getEntry(17))) == 1);
-        p4 = ((((int) marking.getEntry(7))+((int) marking.getEntry(8))+((int) marking.getEntry(12))) == 1);
-        p5 = ((((int) marking.getEntry(15))+((int) marking.getEntry(16))+((int) marking.getEntry(17))) == 1);
-        p6 = ((((int) marking.getEntry(10))+((int) marking.getEntry(11))+((int) marking.getEntry(13))) == 1);
-        p7 = ((((int) marking.getEntry(8))+((int) marking.getEntry(9))+((int) marking.getEntry(10))+((int) marking.getEntry(12))+((int) marking.getEntry(13))) == 2);
-        p8 = ((((int) marking.getEntry(2))+((int) marking.getEntry(3))+((int) marking.getEntry(4))+((int) marking.getEntry(19))) == 3);
-
-        if (!(p1 && p2 && p3 && p4 && p5 && p6 && p7 && p8)){
-       
+        if (!(p1 && p2 && p3 && p4 && p5 && p6 && p7 && p8)) {
             System.out.println("ERROR EN INVARIANTE DE TRANSICION, CERRANDO EJECUCION.");
             System.exit(0);
         }
     }
 
-    public String getSequence(){
-        return sequence;
+    public List<Integer> whichEnabledAfterLastFired() {
+        List<Integer> lista = new ArrayList<>();
+
+        switch (lastFired) {
+            case 0:
+                if (isEnabled(1)==0){
+                    lista.add(1);
+                }
+                if (isEnabled(2)==0){
+                    lista.add(2);
+                }
+                break;
+            case 1:
+                if (isEnabled(3)==0){
+                    lista.add(3);
+                }
+                break;
+            case 2:
+                if (isEnabled(4)==0){
+                    lista.add(4);
+                }
+                break;
+            case 3, 4:
+                if (isEnabled(5)==0){
+                    lista.add(5);
+                }
+                if (isEnabled(6)==0){
+                    lista.add(6);
+                }
+                break;
+            case 5:
+                if (isEnabled(7)==0){
+                    lista.add(7);
+                }
+                break;
+            case 6:
+                if (isEnabled(8)==0){
+                    lista.add(8);
+                }
+                break;
+            case 7:
+                if (isEnabled(9)==0){
+                    lista.add(9);
+                }
+                break;
+            case 8:
+                if (isEnabled(10)==0){
+                    lista.add(10);
+                }
+                break;
+            case 9, 10:
+                if (isEnabled(11)==0){
+                    lista.add(11);
+                }
+                if (isEnabled(12)==0){
+                    lista.add(12);
+                }
+                break;
+            case 11:
+                if (isEnabled(13)==0){
+                    lista.add(13);
+                }
+                break;
+            case 12:
+                if (isEnabled(14)==0){
+                    lista.add(14);
+                }
+                break;
+            case 13, 14:
+                if (isEnabled(15)==0){
+                    lista.add(15);
+                }
+                break;
+            case 15:
+                if (isEnabled(16)==0){
+                    lista.add(16);
+                }
+                break;
+
+            default:
+                lista.add(0);
+                break;
+        }
+        return lista;
     }
+
 }
